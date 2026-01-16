@@ -44,89 +44,131 @@ class OnboardingFlowView extends StatelessWidget {
         final progress = (state.step + 1) / 8;
 
         return Scaffold(
-          body: SafeArea(
-            child: PhoneFrame(
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          t(lang, 'appName'),
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w800),
+          body: Stack(
+            children: [
+              Positioned(
+                left: -150,
+                bottom: -600,
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Container(
+                    transform: Matrix4.identity()..rotateZ(-1.57),
+                    width: 550,
+                    height: 550,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          left: 0,
+                          top: 0,
+                          child: Container(
+                            width: 550,
+                            height: 550,
+                            decoration: const ShapeDecoration(
+                              gradient: RadialGradient(
+                                center: Alignment(0.26, 0.90),
+                                radius: 0.75,
+                                colors: [
+                                  Color(0xBFEAE0C7), // ~75% instead of 100%
+                                  Color(0x00EAE0C7),
+                                ],
+                              ),
+                              shape: OvalBorder(),
+                            ),
+                          ),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () =>
-                            context.read<SettingsBloc>().add(ToggleLanguage()),
-                        child: Text(
-                          lang == 'ar' ? t('ar', 'english') : t('en', 'arabic'),
-                        ),
-                      ),
-                      SoftBadge('${(progress * 100).round()}%'),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: progress,
-                    minHeight: 6,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                  const SizedBox(height: 16),
-
-                  Expanded(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      switchInCurve: Curves.easeOut,
-                      switchOutCurve: Curves.easeIn,
-                      child: _buildStep(context, state, lang),
+                      ],
                     ),
                   ),
-
-                  if (state.step > 0 && state.step < 7)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, bottom: 12),
-                      child: Row(
+                ),
+              ),
+              SafeArea(
+                child: PhoneFrame(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      Row(
                         children: [
                           Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => context
-                                  .read<OnboardingBloc>()
-                                  .add(PreviousStep()),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.arrow_back, size: 18),
-                                  const SizedBox(width: 8),
-                                  Text(t(lang, 'back')),
-                                ],
-                              ),
+                            child: Text(
+                              t(lang, 'appName'),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w800),
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: FilledButton(
-                              onPressed: () => context
-                                  .read<OnboardingBloc>()
-                                  .add(NextStep()),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(t(lang, 'next')),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.arrow_forward, size: 18),
-                                ],
-                              ),
+                          TextButton(
+                            onPressed: () => context.read<SettingsBloc>().add(
+                              ToggleLanguage(),
+                            ),
+                            child: Text(
+                              lang == 'ar'
+                                  ? t('ar', 'english')
+                                  : t('en', 'arabic'),
                             ),
                           ),
+                          SoftBadge('${(progress * 100).round()}%'),
                         ],
                       ),
-                    ),
-                ],
+                      const SizedBox(height: 8),
+                      LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 6,
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      const SizedBox(height: 16),
+
+                      Expanded(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          switchInCurve: Curves.easeOut,
+                          switchOutCurve: Curves.easeIn,
+                          child: _buildStep(context, state, lang),
+                        ),
+                      ),
+
+                      if (state.step > 0 && state.step < 7)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, bottom: 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => context
+                                      .read<OnboardingBloc>()
+                                      .add(PreviousStep()),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.arrow_back, size: 18),
+                                      const SizedBox(width: 8),
+                                      Text(t(lang, 'back')),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: FilledButton(
+                                  onPressed: () => context
+                                      .read<OnboardingBloc>()
+                                      .add(NextStep()),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(t(lang, 'next')),
+                                      const SizedBox(width: 8),
+                                      const Icon(Icons.arrow_forward, size: 18),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         );
       },
