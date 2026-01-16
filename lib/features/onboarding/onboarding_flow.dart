@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/data.dart';
 import '../../core/locator.dart';
@@ -90,7 +91,7 @@ class OnboardingFlowView extends StatelessWidget {
                       child: Row(
                         children: [
                           Expanded(
-                            child: FilledButton.tonal(
+                            child: OutlinedButton(
                               onPressed: () => context
                                   .read<OnboardingBloc>()
                                   .add(PreviousStep()),
@@ -138,96 +139,33 @@ class OnboardingFlowView extends StatelessWidget {
     final bloc = context.read<OnboardingBloc>();
 
     if (step == 0) {
-      final slides = [
-        {
-          'icon': Icons.account_balance_wallet_outlined,
-          't': t(lang, 'onboarding.s1t'),
-          'd': t(lang, 'onboarding.s1d'),
-        },
-        {
-          'icon': Icons.warning_amber_rounded,
-          't': t(lang, 'onboarding.s2t'),
-          'd': t(lang, 'onboarding.s2d'),
-        },
-        {
-          'icon': Icons.auto_awesome,
-          't': t(lang, 'onboarding.s3t'),
-          'd': t(lang, 'onboarding.s3d'),
-        },
-      ];
-
-      return Card(
-        key: key,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ...slides.map((x) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Icon(x['icon'] as IconData, size: 22),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${x['t']}',
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.w800),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              '${x['d']}',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-              const Spacer(),
-              FilledButton(
-                onPressed: () => bloc.add(NextStep()),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(t(lang, 'startNow')),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward, size: 18),
-                  ],
-                ),
-              ),
-            ],
+      return Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Lottie.asset('assets/animations/on_boarding.json'),
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                FilledButton(
+                  onPressed: () => bloc.add(NextStep()),
+                  child: Text(t(lang, 'startNow')),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(
+                  onPressed: () {
+                    // TODO: Implement already a user flow
+                  },
+                  child: Text(lang == 'ar' ? 'لديك حساب؟' : 'Already a user?'),
+                ),
+              ],
+            ),
+          ),
+        ],
       );
     }
 
