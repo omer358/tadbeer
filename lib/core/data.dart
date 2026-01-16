@@ -44,7 +44,7 @@ const months = [
 
 const i18n = {
   'en': {
-    'appName': 'SmartSpend',
+    'appName': 'Tadbeer',
     'tagline': 'AI budget coach built for real life',
     'next': 'Next',
     'back': 'Back',
@@ -109,7 +109,7 @@ const i18n = {
     'onboarding.s3d': 'Set goals, track progress, and adjust with AI guidance.',
   },
   'ar': {
-    'appName': 'سمارت سبند',
+    'appName': 'تدبير',
     'tagline': 'مدرب ميزانية بالذكاء الاصطناعي',
     'next': 'التالي',
     'back': 'رجوع',
