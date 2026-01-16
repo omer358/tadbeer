@@ -170,7 +170,7 @@ class OnboardingFlowView extends StatelessWidget {
     }
 
     if (step == 1) {
-      return Card(
+      return Container(
         key: key,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -262,7 +262,7 @@ class OnboardingFlowView extends StatelessWidget {
     }
 
     if (step == 2) {
-      return Card(
+      return Container(
         key: key,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -347,7 +347,7 @@ class OnboardingFlowView extends StatelessWidget {
         'bnpl',
         'bills',
       ];
-      return Card(
+      return Container(
         key: key,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -403,7 +403,7 @@ class OnboardingFlowView extends StatelessWidget {
     }
 
     if (step == 4) {
-      return Card(
+      return Container(
         key: key,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -596,7 +596,7 @@ class OnboardingFlowView extends StatelessWidget {
     // For brevity, using placeholder logic for 5 and 6, but 7 is submit.
     if (step == 5) {
       // Questionnaire
-      return Card(
+      return Container(
         key: key,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -632,7 +632,7 @@ class OnboardingFlowView extends StatelessWidget {
 
     if (step == 6) {
       // First Expense
-      return Card(
+      return Container(
         key: key,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -669,7 +669,7 @@ class OnboardingFlowView extends StatelessWidget {
     }
 
     // Step 7: Completion
-    return Card(
+    return Container(
       key: key,
       child: Padding(
         padding: const EdgeInsets.all(16),

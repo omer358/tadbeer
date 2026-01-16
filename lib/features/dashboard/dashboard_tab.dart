@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/data.dart';
 import '../../widgets/components.dart';
-import '../../widgets/insight_banner.dart';
 // import '../../widgets/charts.dart';
 import '../../features/dashboard/bloc/dashboard_bloc.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
