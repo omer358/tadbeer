@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../domain/repositories/data_repository.dart';
+import '../../../../core/exceptions.dart';
+import '../../../../core/data.dart';
 
 // Events
 abstract class CoachEvent extends Equatable {
@@ -98,11 +100,22 @@ class CoachBloc extends Bloc<CoachEvent, CoachState> {
           state.copyWith(messages: newerMessages, status: CoachStatus.success),
         );
       } catch (e) {
+        String errorMessage;
+        if (e is ConnectionTimeoutException) {
+          errorMessage = t(event.lang, 'error.timeout');
+        } else if (e is NetworkException) {
+          errorMessage = t(event.lang, 'error.noInternet');
+        } else if (e is ServerException) {
+          errorMessage = t(event.lang, 'error.server');
+        } else {
+          errorMessage = '${t(event.lang, 'error.unknown')} ($e)';
+        }
+
         // Add error message as bot response
         final newerMessages = List<ChatMessage>.from(state.messages)
           ..add(
             ChatMessage(
-              text: "Error: $e",
+              text: errorMessage,
               isUser: false,
               timestamp: DateTime.now(),
             ),

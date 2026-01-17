@@ -5,6 +5,8 @@ import '../../domain/repositories/data_repository.dart';
 import '../../domain/entities/user.dart';
 import '../datasources/fake_local_data_source.dart';
 
+import 'package:dio/dio.dart';
+import '../../core/exceptions.dart';
 import '../datasources/remote_data_source.dart';
 
 class DataRepositoryImpl implements DataRepository {
@@ -46,6 +48,26 @@ class DataRepositoryImpl implements DataRepository {
   }) => _localDataSource.signUp(user, profile, goal, firstTxn);
 
   @override
-  Future<String> askCoach(String query, String lang) =>
-      _remoteDataSource.askCoach(query, lang);
+  Future<String> askCoach(String query, String lang) async {
+    try {
+      return await _remoteDataSource.askCoach(query, lang);
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        throw ConnectionTimeoutException();
+      } else if (e.type == DioExceptionType.connectionError) {
+        throw NetworkException();
+      } else if (e.type == DioExceptionType.badResponse) {
+        throw ServerException(
+          e.message ?? 'Server Error',
+          e.response?.statusCode,
+        );
+      } else {
+        throw ServerException(e.message ?? 'Unknown Error');
+      }
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
 }

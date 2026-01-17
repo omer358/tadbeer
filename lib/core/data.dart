@@ -107,6 +107,10 @@ const i18n = {
     'onboarding.s2d': 'We help you see the real cost and stay in control.',
     'onboarding.s3t': 'Personal plan + weekly coaching.',
     'onboarding.s3d': 'Set goals, track progress, and adjust with AI guidance.',
+    'error.timeout': 'Connection timed out. Please try again.',
+    'error.noInternet': 'No internet connection. Please check your connection.',
+    'error.server': 'We encountered a technical issue. Please try again later.',
+    'error.unknown': 'An unexpected error occurred.',
   },
   'ar': {
     'appName': 'تدبير',
@@ -172,6 +176,12 @@ const i18n = {
     'onboarding.s2d': 'نساعدك تتحكم وتوقف النزيف قبل نهاية الشهر.',
     'onboarding.s3t': 'خطة شخصية + ملخص أسبوعي.',
     'onboarding.s3d': 'حدد هدف وامشي عليه بخطوات واضحة.',
+    'error.timeout':
+        'عذراً، استغرق الاتصال وقتاً طويلاً. يرجى المحاولة مرة أخرى.',
+    'error.noInternet':
+        'عذراً، لا يوجد اتصال بالانترنت. يرجى التحقق من اتصالك.',
+    'error.server': 'واجهنا مشكلة فنية. يرجى المحاولة في وقت لاحق.',
+    'error.unknown': 'حدث خطأ غير متوقع.',
   },
 };
 
