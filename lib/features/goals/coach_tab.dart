@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/data.dart';
 import '../../core/locator.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/dashboard/bloc/dashboard_bloc.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
 import 'bloc/coach_bloc.dart';
@@ -83,39 +84,61 @@ class _CoachViewState extends State<_CoachView> {
           padding: const EdgeInsets.all(16),
           color: Theme.of(context).colorScheme.surface,
           child: Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Theme.of(
                 context,
               ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Theme.of(
+                  context,
+                ).colorScheme.outlineVariant.withOpacity(0.5),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  lang == 'ar' ? 'ملخص سريع' : 'Quick summary',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      lang == 'ar' ? 'ملخص سريع' : 'Quick summary',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 ...suggestions.map(
                   (s) => Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.auto_awesome, size: 18),
-                        const SizedBox(width: 10),
-                        Expanded(child: Text(s)),
+                        const Text(
+                          '• ',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Expanded(
+                          child: Text(
+                            s,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-          ),
+          ).animate().fade().slideY(begin: -0.2, end: 0),
         ),
 
         // Chat List
@@ -124,14 +147,25 @@ class _CoachViewState extends State<_CoachView> {
             builder: (context, state) {
               if (state.messages.isEmpty) {
                 return Center(
-                  child: Text(
-                    lang == 'ar'
-                        ? 'كيف يمكنني مساعدتك اليوم؟'
-                        : 'How can I help you today?',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        lang == 'ar'
+                            ? 'كيف يمكنني مساعدتك اليوم؟'
+                            : 'How can I help you today?',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ).animate().fade().scale(),
                 );
               }
               return ListView.builder(
@@ -162,7 +196,7 @@ class _CoachViewState extends State<_CoachView> {
                         ),
                         child: const _TypingIndicator(),
                       ),
-                    );
+                    ).animate().fade().slideX(begin: -0.1, end: 0);
                   }
                   final msg = state.messages[index];
                   return Align(
@@ -202,7 +236,7 @@ class _CoachViewState extends State<_CoachView> {
                         ),
                       ),
                     ),
-                  );
+                  ).animate().fade().slideY(begin: 0.1, end: 0);
                 },
               );
             },
@@ -244,6 +278,10 @@ class _CoachViewState extends State<_CoachView> {
               ),
               const SizedBox(width: 8),
               IconButton.filled(
+                style: IconButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                ),
                 onPressed: _send,
                 icon: const Icon(Icons.send_rounded),
               ),

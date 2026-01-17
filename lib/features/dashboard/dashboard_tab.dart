@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/data.dart';
 import '../../widgets/components.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 // import '../../widgets/charts.dart';
 import '../../features/dashboard/bloc/dashboard_bloc.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
@@ -81,192 +82,247 @@ class DashboardTab extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
+            ).animate().fade(duration: 500.ms).slideY(begin: 0.1, end: 0),
             const SizedBox(height: 10),
             Row(
-              children: [
-                Expanded(
-                  child: StatCard(
-                    label: t(lang, 'safeToSpend'),
-                    value: fmtSAR(safe),
-                    sub: safe < 0
-                        ? (lang == 'ar' ? 'تجاوزت الحد' : 'Over budget')
-                        : (lang == 'ar' ? 'ضمن الحدود' : 'Within limits'),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Card(
+                  children: [
+                    Expanded(
+                      child: StatCard(
+                        label: t(lang, 'safeToSpend'),
+                        value: fmtSAR(safe),
+                        sub: safe < 0
+                            ? (lang == 'ar' ? 'تجاوزت الحد' : 'Over budget')
+                            : (lang == 'ar' ? 'ضمن الحدود' : 'Within limits'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                t(lang, 'importStatement'),
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                    ),
+                              ),
+                              const SizedBox(height: 10),
+                              FilledButton.tonal(
+                                onPressed: () => _openStatement(context, lang),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.upload_file_outlined,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(t(lang, 'upload')),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+                .animate()
+                .fade(delay: 100.ms, duration: 500.ms)
+                .slideY(begin: 0.1, end: 0),
+
+            const SizedBox(height: 12),
+
+            if (goal != null)
+              Card(
                     child: Padding(
                       padding: const EdgeInsets.all(14),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(
-                            t(lang, 'importStatement'),
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
+                          SectionTitle(
+                            icon: const Icon(Icons.flag_rounded, size: 18),
+                            title: t(lang, 'goals'),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      goal.name,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      lang == 'ar'
+                                          ? 'الهدف: ${fmtSAR(target)} خلال $deadline شهر'
+                                          : 'Target: ${fmtSAR(target)} in $deadline months',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
+                                    ),
+                                  ],
                                 ),
+                              ),
+                              SoftBadge('$pct%'),
+                            ],
                           ),
                           const SizedBox(height: 10),
-                          FilledButton.tonal(
-                            onPressed: () => _openStatement(context, lang),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.upload_file_outlined,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(t(lang, 'upload')),
-                              ],
-                            ),
+                          LinearProgressIndicator(
+                            value: (saved / (target == 0 ? 1 : target))
+                                .clamp(0, 1)
+                                .toDouble(),
+                            minHeight: 8,
+                            borderRadius: BorderRadius.circular(99),
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            // Charts (Donut)
-            // ...
-            if (goal != null)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SectionTitle(
-                        icon: const Icon(Icons.flag_outlined, size: 18),
-                        title: t(lang, 'goals'),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text(
-                                  goal.name,
-                                  style: Theme.of(context).textTheme.titleSmall
-                                      ?.copyWith(fontWeight: FontWeight.w800),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  lang == 'ar'
-                                      ? 'الهدف: ${fmtSAR(target)} خلال $deadline شهر'
-                                      : 'Target: ${fmtSAR(target)} in $deadline months',
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurfaceVariant,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SoftBadge('$pct%'),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      LinearProgressIndicator(
-                        value: (saved / (target == 0 ? 1 : target))
-                            .clamp(0, 1)
-                            .toDouble(),
-                        minHeight: 8,
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                    ],
-                  ),
-                ),
-              )
+                  )
+                  .animate()
+                  .fade(delay: 200.ms, duration: 500.ms)
+                  .slideY(begin: 0.1, end: 0)
             else
               Card(
-                child: ListTile(
-                  title: Text(t(lang, 'addGoal')),
-                  trailing: const Icon(Icons.add),
-                  onTap: () =>
-                      _openAddGoal(context, lang, income, fixed, variableSpent),
-                ),
-              ),
+                    child: ListTile(
+                      title: Text(t(lang, 'addGoal')),
+                      trailing: const Icon(Icons.add),
+                      onTap: () => _openAddGoal(
+                        context,
+                        lang,
+                        income,
+                        fixed,
+                        variableSpent,
+                      ),
+                    ),
+                  )
+                  .animate()
+                  .fade(delay: 200.ms, duration: 500.ms)
+                  .slideY(begin: 0.1, end: 0),
 
             const SizedBox(height: 12),
             Card(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SectionTitle(
-                      icon: const Icon(Icons.receipt_long_outlined, size: 18),
-                      title: t(lang, 'recent'),
-                      right: TextButton.icon(
-                        onPressed: () => _openAddExpense(context, lang),
-                        icon: const Icon(Icons.add, size: 18),
-                        label: Text(t(lang, 'addExpense')),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...txns.take(5).map((x) {
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.outlineVariant,
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SectionTitle(
+                          icon: const Icon(
+                            Icons.receipt_long_rounded,
+                            size: 18,
+                          ),
+                          title: t(lang, 'recent'),
+                          right: TextButton.icon(
+                            onPressed: () => _openAddExpense(context, lang),
+                            icon: const Icon(Icons.add, size: 18),
+                            label: Text(t(lang, 'addExpense')),
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Text(
-                                    x.description,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(fontWeight: FontWeight.w800),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${catLabel(lang, x.category)} • ${x.date.toString().substring(0, 10)}',
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
-                                        ),
-                                  ),
-                                ],
+                        const SizedBox(height: 10),
+                        ...txns.take(5).map((x) {
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.outlineVariant.withOpacity(0.5),
                               ),
                             ),
-                            Text(
-                              fmtSAR(x.amount),
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.05),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.sell_outlined,
+                                    size: 16,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Text(
+                                        x.description,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${catLabel(lang, x.category)} • ${x.date.toString().substring(0, 10)}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
+                                              fontSize: 11,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  fmtSAR(x.amount),
+                                  style: Theme.of(context).textTheme.titleSmall
+                                      ?.copyWith(fontWeight: FontWeight.w800),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
+                          ).animate().fade().slideX();
+                        }),
+                      ],
+                    ),
+                  ),
+                )
+                .animate()
+                .fade(delay: 300.ms, duration: 500.ms)
+                .slideY(begin: 0.1, end: 0),
 
             const SizedBox(height: 24),
           ],

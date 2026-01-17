@@ -57,30 +57,43 @@ class _AppShellState extends State<AppShell> {
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 20,
         title: Row(
           children: [
-            const Icon(Icons.wallet, size: 24),
-            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.wallet, size: 20, color: Colors.white),
+            ),
+            const SizedBox(width: 12),
             Text(
               t(lang, 'appName'),
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w900,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
                 letterSpacing: -0.5,
               ),
             ),
           ],
         ),
         actions: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: month,
-                underline: const SizedBox(),
-                icon: const Icon(Icons.arrow_drop_down, size: 18),
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
+                isDense: true,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 items: months
                     .map(
@@ -94,13 +107,12 @@ class _AppShellState extends State<AppShell> {
               ),
             ),
           ),
-          const SizedBox(width: 6),
         ],
       ),
       body: SafeArea(
         child: PhoneFrame(
           child: Padding(
-            padding: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
             child: content[tab],
           ),
         ),
@@ -108,38 +120,58 @@ class _AppShellState extends State<AppShell> {
       floatingActionButton: tab == 0
           ? FloatingActionButton(
               onPressed: () => _openAddExpense(context),
+              elevation: 4,
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              foregroundColor: Theme.of(context).colorScheme.onSecondary,
               child: const Icon(Icons.add),
             )
           : null,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: tab,
-        onDestinationSelected: (i) {
-          setState(() => tab = i);
-          // Refresh dashboard when returning to it?
-          if (i == 0) _refresh();
-        },
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.home_outlined),
-            label: t(lang, 'dashboard'),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(
+                context,
+              ).colorScheme.outlineVariant.withOpacity(0.5),
+            ),
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.receipt_long_outlined),
-            label: t(lang, 'expenses'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.auto_awesome_outlined),
-            label: t(lang, 'aiCoach'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.flag_outlined),
-            label: t(lang, 'goals'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            label: t(lang, 'settings'),
-          ),
-        ],
+        ),
+        child: NavigationBar(
+          selectedIndex: tab,
+          onDestinationSelected: (i) {
+            setState(() => tab = i);
+            if (i == 0) _refresh();
+          },
+          height: 65,
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.grid_view_outlined),
+              selectedIcon: const Icon(Icons.grid_view_rounded),
+              label: t(lang, 'dashboard'),
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.receipt_long_outlined),
+              selectedIcon: const Icon(Icons.receipt_long_rounded),
+              label: t(lang, 'expenses'),
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.auto_awesome_outlined),
+              selectedIcon: const Icon(Icons.auto_awesome),
+              label: t(lang, 'aiCoach'),
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.flag_outlined),
+              selectedIcon: const Icon(Icons.flag_rounded),
+              label: t(lang, 'goals'),
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings_rounded),
+              label: t(lang, 'settings'),
+            ),
+          ],
+        ),
       ),
     );
   }
