@@ -144,10 +144,23 @@ class _CoachViewState extends State<_CoachView> {
                     (state.status == CoachStatus.loading ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= state.messages.length) {
-                    return const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                    return Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(
+                            20,
+                          ).copyWith(bottomLeft: const Radius.circular(4)),
+                        ),
+                        child: const _TypingIndicator(),
                       ),
                     );
                   }
@@ -238,6 +251,88 @@ class _CoachViewState extends State<_CoachView> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TypingIndicator extends StatefulWidget {
+  const _TypingIndicator();
+
+  @override
+  State<_TypingIndicator> createState() => _TypingIndicatorState();
+}
+
+class _TypingIndicatorState extends State<_TypingIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 40,
+      height: 20,
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _Dot(controller: _controller, delay: 0.0),
+            const SizedBox(width: 4),
+            _Dot(controller: _controller, delay: 0.2),
+            const SizedBox(width: 4),
+            _Dot(controller: _controller, delay: 0.4),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Dot extends StatelessWidget {
+  final AnimationController controller;
+  final double delay;
+
+  const _Dot({required this.controller, required this.delay});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        final double opacity =
+            (math.sin((controller.value * 2 * math.pi) + (delay * math.pi)) +
+                1) /
+            2;
+        return Opacity(
+          opacity: 0.5 + (opacity * 0.5),
+          child: Transform.translate(
+            offset: Offset(0, -4 * opacity),
+            child: child,
+          ),
+        );
+      },
+      child: Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          shape: BoxShape.circle,
+        ),
+      ),
     );
   }
 }
