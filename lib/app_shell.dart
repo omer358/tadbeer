@@ -5,10 +5,9 @@ import 'widgets/components.dart';
 import 'features/dashboard/dashboard_tab.dart';
 import 'features/expenses/expenses_tab.dart';
 import 'features/goals/goals_tab.dart';
+import 'features/goals/coach_tab.dart';
 import 'features/settings/settings_tab.dart';
 import 'features/transactions/add_expense_dialog.dart';
-
-import 'features/goals/coach_dialog.dart';
 
 import 'features/dashboard/bloc/dashboard_bloc.dart';
 import 'features/expenses/bloc/expenses_bloc.dart';
@@ -51,6 +50,7 @@ class _AppShellState extends State<AppShell> {
     final content = [
       const DashboardTab(),
       const ExpensesTab(),
+      const CoachTab(),
       const GoalsTab(),
       const SettingsTab(),
     ];
@@ -94,11 +94,6 @@ class _AppShellState extends State<AppShell> {
               ),
             ),
           ),
-          IconButton(
-            onPressed: () => _openCoach(context),
-            icon: const Icon(Icons.auto_awesome_outlined),
-            tooltip: t(lang, 'aiCoach'),
-          ),
           const SizedBox(width: 6),
         ],
       ),
@@ -131,6 +126,10 @@ class _AppShellState extends State<AppShell> {
           NavigationDestination(
             icon: const Icon(Icons.receipt_long_outlined),
             label: t(lang, 'expenses'),
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.auto_awesome_outlined),
+            label: t(lang, 'aiCoach'),
           ),
           NavigationDestination(
             icon: const Icon(Icons.flag_outlined),
@@ -167,26 +166,5 @@ class _AppShellState extends State<AppShell> {
     // Let's assume AddExpenseDialog handles its internal state and returns data.
     // I will refactor AddExpenseDialog later to return an Entity or use BLoC directly.
     // For now, let's keep it simple: AddExpenseDialog returns Map, we convert.
-  }
-
-  Future<void> _openCoach(BuildContext context) async {
-    final lang = context.read<SettingsBloc>().state.locale.languageCode;
-    // We need current data for coach
-    final dbState = context.read<DashboardBloc>().state;
-    // ...
-    await showDialog(
-      context: context,
-      builder: (_) => CoachDialog(
-        lang: lang,
-        totals: {
-          'variable': dbState.totalSpent,
-          'bnpl': 0, // TODO: calculate bnpl specific from list
-        },
-        goal: {
-          'saved': dbState.goal?.savedAmount ?? 0,
-          'target': dbState.goal?.targetAmount ?? 0,
-        }, // adaptor
-      ),
-    );
   }
 }
