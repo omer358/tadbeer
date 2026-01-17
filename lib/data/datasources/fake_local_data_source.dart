@@ -1,6 +1,7 @@
 import '../../domain/entities/goal.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/user_profile.dart';
+import '../../domain/entities/user.dart';
 
 class FakeLocalDataSource {
   UserProfile _profile = UserProfile.empty;
@@ -49,5 +50,18 @@ class FakeLocalDataSource {
 
   Future<Map<String, double>> getBudgets() async {
     return _budgets;
+  }
+
+  Future<void> signUp(
+    User user,
+    UserProfile profile,
+    Goal goal,
+    TransactionEntity txn,
+  ) async {
+    await Future.delayed(const Duration(milliseconds: 1000));
+    _profile = profile;
+    _goal = goal;
+    _transactions.insert(0, txn);
+    // In a real app, we'd save the 'user' auth data too.
   }
 }

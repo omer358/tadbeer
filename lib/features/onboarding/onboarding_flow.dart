@@ -1035,7 +1035,7 @@ class OnboardingFlowView extends StatelessWidget {
       );
     }
 
-    // Step 7: Completion
+    // Step 7: Sign Up
     return Container(
       key: key,
       child: Padding(
@@ -1043,25 +1043,54 @@ class OnboardingFlowView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Text(
+              lang == 'ar' ? 'إنشاء حساب' : 'Create Account',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            ),
             const SizedBox(height: 10),
             Text(
               lang == 'ar'
-                  ? 'لتزامن بياناتك ومتابعة تقدمك عبر الأجهزة.'
+                  ? 'لتزامن بياناتك ومتابعة تقدمك.'
                   : 'Sync your data and keep your progress.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: lang == 'ar' ? 'الاسم' : 'Name',
+              ),
+              onChanged: (v) => bloc.add(UpdateAuthData(name: v)),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: lang == 'ar' ? 'البريد الإلكتروني' : 'Email',
+              ),
+              keyboardType: TextInputType.emailAddress,
+              onChanged: (v) => bloc.add(UpdateAuthData(email: v)),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: lang == 'ar' ? 'كلمة المرور' : 'Password',
+              ),
+              obscureText: true,
+              onChanged: (v) => bloc.add(UpdateAuthData(password: v)),
+            ),
+            const SizedBox(height: 24),
             if (state.status == OnboardingStatus.submitting)
               const Center(child: CircularProgressIndicator())
             else
               FilledButton(
-                onPressed: () => bloc.add(CompleteOnboarding()),
+                onPressed: () => bloc.add(SignUp()),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(t(lang, 'continue')),
+                    Text(lang == 'ar' ? 'إنشاء حساب' : 'Create Account'),
                     const SizedBox(width: 8),
                     const Icon(Icons.arrow_forward, size: 18),
                   ],

@@ -1,6 +1,7 @@
 import '../entities/goal.dart';
 import '../entities/transaction.dart';
 import '../entities/user_profile.dart';
+import '../entities/user.dart';
 
 abstract class DataRepository {
   Future<UserProfile> getUserProfile();
@@ -15,4 +16,11 @@ abstract class DataRepository {
   // For budget/categories (simplified as map in profile or separate?)
   // The original code passed 'budgets' map.
   Future<Map<String, double>> getBudgets();
+
+  Future<void> signUp({
+    required User user,
+    required UserProfile profile,
+    required Goal goal,
+    required TransactionEntity firstTxn,
+  });
 }

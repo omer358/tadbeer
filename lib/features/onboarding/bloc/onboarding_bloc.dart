@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../domain/entities/goal.dart';
 import '../../../../domain/entities/transaction.dart';
 import '../../../../domain/entities/user_profile.dart';
+import '../../../../domain/entities/user.dart';
 import '../../../../domain/repositories/data_repository.dart';
 
 // Events
@@ -80,6 +81,15 @@ class UpdateFirstFn extends OnboardingEvent {
   const UpdateFirstFn(this.amount, this.description, this.category, this.date);
 }
 
+class UpdateAuthData extends OnboardingEvent {
+  final String? email;
+  final String? password;
+  final String? name;
+  const UpdateAuthData({this.email, this.password, this.name});
+}
+
+class SignUp extends OnboardingEvent {}
+
 class CompleteOnboarding extends OnboardingEvent {}
 
 // State
@@ -107,6 +117,10 @@ class OnboardingState extends Equatable {
   final String firstTxnDesc;
   final String firstTxnCategory;
   final DateTime firstTxnDate;
+
+  final String email;
+  final String password;
+  final String name;
 
   const OnboardingState({
     this.step = 0,
@@ -138,7 +152,10 @@ class OnboardingState extends Equatable {
     this.firstTxnAmount = 58,
     this.firstTxnDesc = 'AlBaik',
     this.firstTxnCategory = 'restaurants',
-    required this.firstTxnDate, // Passed in constructor or default
+    required this.firstTxnDate,
+    this.email = '',
+    this.password = '',
+    this.name = '',
   });
 
   OnboardingState copyWith({
@@ -162,6 +179,9 @@ class OnboardingState extends Equatable {
     String? firstTxnDesc,
     String? firstTxnCategory,
     DateTime? firstTxnDate,
+    String? email,
+    String? password,
+    String? name,
   }) {
     return OnboardingState(
       step: step ?? this.step,
@@ -184,6 +204,9 @@ class OnboardingState extends Equatable {
       firstTxnDesc: firstTxnDesc ?? this.firstTxnDesc,
       firstTxnCategory: firstTxnCategory ?? this.firstTxnCategory,
       firstTxnDate: firstTxnDate ?? this.firstTxnDate,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      name: name ?? this.name,
     );
   }
 
@@ -209,6 +232,9 @@ class OnboardingState extends Equatable {
     firstTxnDesc,
     firstTxnCategory,
     firstTxnDate,
+    email,
+    password,
+    name,
   ];
 }
 
@@ -326,7 +352,17 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       );
     });
 
-    on<CompleteOnboarding>((event, emit) async {
+    on<UpdateAuthData>((event, emit) {
+      emit(
+        state.copyWith(
+          email: event.email,
+          password: event.password,
+          name: event.name,
+        ),
+      );
+    });
+
+    on<SignUp>((event, emit) async {
       emit(state.copyWith(status: OnboardingStatus.submitting));
 
       final profile = UserProfile(
@@ -361,9 +397,19 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         isBnpl: state.firstTxnCategory == 'bnpl',
       );
 
-      await _repo.saveUserProfile(profile);
-      await _repo.saveGoal(goal);
-      await _repo.addTransaction(txn);
+      final user = User(
+        id: const Uuid().v4(),
+        email: state.email,
+        name: state.name,
+        password: state.password,
+      );
+
+      await _repo.signUp(
+        user: user,
+        profile: profile,
+        goal: goal,
+        firstTxn: txn,
+      );
 
       emit(state.copyWith(status: OnboardingStatus.success));
     });

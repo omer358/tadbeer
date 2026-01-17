@@ -2,6 +2,7 @@ import '../../domain/entities/goal.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/repositories/data_repository.dart';
+import '../../domain/entities/user.dart';
 import '../datasources/fake_local_data_source.dart';
 
 class DataRepositoryImpl implements DataRepository {
@@ -32,4 +33,12 @@ class DataRepositoryImpl implements DataRepository {
 
   @override
   Future<Map<String, double>> getBudgets() => _dataSource.getBudgets();
+
+  @override
+  Future<void> signUp({
+    required User user,
+    required UserProfile profile,
+    required Goal goal,
+    required TransactionEntity firstTxn,
+  }) => _dataSource.signUp(user, profile, goal, firstTxn);
 }
