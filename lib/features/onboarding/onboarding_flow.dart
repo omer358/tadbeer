@@ -90,7 +90,23 @@ class OnboardingFlowView extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              t(lang, 'appName'),
+                              state.step == 0
+                                  ? t(lang, 'appName')
+                                  : state.step == 1
+                                  ? t(lang, 'incomeTitle')
+                                  : state.step == 2
+                                  ? t(lang, 'fixedTitle')
+                                  : state.step == 3
+                                  ? t(lang, 'variableTitle')
+                                  : state.step == 4
+                                  ? t(lang, 'goalTitle')
+                                  : state.step == 5
+                                  ? t(lang, 'questionnaire')
+                                  : state.step == 6
+                                  ? t(lang, 'firstExpense')
+                                  : state.step == 7
+                                  ? t(lang, 'saveProgress')
+                                  : '',
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(fontWeight: FontWeight.w800),
                             ),
@@ -121,13 +137,22 @@ class OnboardingFlowView extends StatelessWidget {
                           duration: const Duration(milliseconds: 200),
                           switchInCurve: Curves.easeOut,
                           switchOutCurve: Curves.easeIn,
+                          layoutBuilder: (currentChild, previousChildren) {
+                            return Stack(
+                              alignment: Alignment.topCenter,
+                              children: [
+                                ...previousChildren,
+                                if (currentChild != null) currentChild,
+                              ],
+                            );
+                          },
                           child: _buildStep(context, state, lang),
                         ),
                       ),
 
                       if (state.step > 0 && state.step < 7)
                         Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 12),
+                          padding: const EdgeInsets.only(top: 16, bottom: 12),
                           child: Row(
                             children: [
                               Expanded(
@@ -175,6 +200,17 @@ class OnboardingFlowView extends StatelessWidget {
     );
   }
 
+  Widget _buildDot() {
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: const ShapeDecoration(
+        color: Color(0xFFD9D9D9), // Example color
+        shape: OvalBorder(),
+      ),
+    );
+  }
+
   Widget _buildStep(BuildContext context, OnboardingState state, String lang) {
     final step = state.step;
     final key = ValueKey('step_$step');
@@ -215,89 +251,246 @@ class OnboardingFlowView extends StatelessWidget {
       return Container(
         key: key,
         child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                t(lang, 'incomeTitle'),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: t(lang, 'incomeTitle')),
-                controller: TextEditingController(
-                  text: state.incomeAmount.toString(),
-                ), // Note: creation in build is suboptimal but okay for prototype
-                onChanged: (v) => bloc.add(
-                  UpdateIncome(
-                    double.tryParse(v) ?? state.incomeAmount,
-                    state.incomeSource,
-                    state.payday,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Message Bubble
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        decoration: ShapeDecoration(
+                          color: const Color(0xFFEDE3CB),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: Text(
+                          t(
+                            lang,
+                            'We need to understand more about your income and spending, Please provide us with details below',
+                          ),
+                          style: const TextStyle(
+                            color: Color(0xFF1E1E1E),
+                            fontSize: 16,
+                            fontFamily: 'Quicksand',
+                            fontWeight: FontWeight.w500,
+                            height: 1.40,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Avatar Stack (Simplified from snippet)
+                    SizedBox(
+                      width: 27,
+                      height: 28,
+                      child: Stack(
+                        children: [
+                          Positioned(left: 5, top: 15.50, child: _buildDot()),
+                          Positioned(left: 14.50, top: 3, child: _buildDot()),
+                          Positioned(left: 0, top: 0, child: _buildDot()),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+
+                // Monthly Income
+                // Monthly Income
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFD9D9D9)),
+                  ),
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(
+                      fontFamily: 'Quicksand',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF1E1E1E),
+                    ),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      border: InputBorder.none,
+                      hintText: '12000',
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(
+                          'SAR',
+                          style: const TextStyle(
+                            fontFamily: 'Quicksand',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF1E1E1E),
+                          ),
+                        ),
+                      ),
+                    ),
+                    initialValue: state.incomeAmount.toString(),
+                    onChanged: (v) => bloc.add(
+                      UpdateIncome(
+                        double.tryParse(v) ?? state.incomeAmount,
+                        state.incomeSource,
+                        state.payday,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: state.incomeSource,
-                      decoration: InputDecoration(
-                        labelText: t(lang, 'incomeSource'),
-                      ),
-                      items: [
-                        DropdownMenuItem(
-                          value: 'salary',
-                          child: Text(lang == 'ar' ? 'راتب' : 'Salary'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'freelance',
-                          child: Text(lang == 'ar' ? 'عمل حر' : 'Freelance'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'business',
-                          child: Text(lang == 'ar' ? 'تجارة' : 'Business'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'mixed',
-                          child: Text(lang == 'ar' ? 'متعدد' : 'Mixed'),
-                        ),
-                      ],
-                      onChanged: (v) => bloc.add(
-                        UpdateIncome(
-                          state.incomeAmount,
-                          v ?? state.incomeSource,
-                          state.payday,
-                        ),
+
+                const SizedBox(height: 24),
+
+                // Row for Income Source and Payday
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            t(lang, 'incomeSource'),
+                            style: const TextStyle(
+                              color: Color(0xFF1E1E1E),
+                              fontSize: 16,
+                              fontFamily: 'Quicksand',
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            height: 48, // Fixed height to match design feel
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFFD9D9D9),
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: state.incomeSource,
+                                isExpanded: true,
+                                icon: const Icon(Icons.arrow_drop_down),
+                                style: const TextStyle(
+                                  fontFamily: 'Quicksand',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF1E1E1E),
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'salary',
+                                    child: Text(
+                                      lang == 'ar' ? 'راتب' : 'Salary',
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'freelance',
+                                    child: Text(
+                                      lang == 'ar' ? 'عمل حر' : 'Freelance',
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'business',
+                                    child: Text(
+                                      lang == 'ar' ? 'تجارة' : 'Business',
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'mixed',
+                                    child: Text(
+                                      lang == 'ar' ? 'متعدد' : 'Mixed',
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (v) => bloc.add(
+                                  UpdateIncome(
+                                    state.incomeAmount,
+                                    v ?? state.incomeSource,
+                                    state.payday,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: state.payday.toString(),
-                      decoration: InputDecoration(labelText: t(lang, 'payday')),
-                      items: List.generate(28, (i) => (i + 1).toString())
-                          .map(
-                            (d) => DropdownMenuItem(value: d, child: Text(d)),
-                          )
-                          .toList(),
-                      onChanged: (v) => bloc.add(
-                        UpdateIncome(
-                          state.incomeAmount,
-                          state.incomeSource,
-                          int.tryParse(v ?? '25') ?? 25,
-                        ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            t(lang, 'payday'),
+                            style: const TextStyle(
+                              color: Color(0xFF1E1E1E),
+                              fontSize: 16,
+                              fontFamily: 'Quicksand',
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFFD9D9D9),
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: state.payday.toString(),
+                                isExpanded: true,
+                                icon: const Icon(Icons.arrow_drop_down),
+                                style: const TextStyle(
+                                  fontFamily: 'Quicksand',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF1E1E1E),
+                                ),
+                                items:
+                                    List.generate(28, (i) => (i + 1).toString())
+                                        .map(
+                                          (d) => DropdownMenuItem(
+                                            value: d,
+                                            child: Text(d),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (v) => bloc.add(
+                                  UpdateIncome(
+                                    state.incomeAmount,
+                                    state.incomeSource,
+                                    int.tryParse(v ?? '25') ?? 25,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -311,12 +504,6 @@ class OnboardingFlowView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                t(lang, 'fixedTitle'),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-              ),
               const SizedBox(height: 12),
               Expanded(
                 child: ListView.separated(
@@ -381,14 +568,7 @@ class OnboardingFlowView extends StatelessWidget {
     }
 
     if (step == 3) {
-      final keys = [
-        'restaurants',
-        'delivery',
-        'transport',
-        'shopping',
-        'bnpl',
-        'bills',
-      ];
+      final keys = ['restaurants', 'transport', 'shopping', 'bnpl', 'bills'];
       return Container(
         key: key,
         child: Padding(
@@ -396,12 +576,6 @@ class OnboardingFlowView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                t(lang, 'variableTitle'),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-              ),
               const SizedBox(height: 12),
               Expanded(
                 child: ListView.separated(
@@ -452,12 +626,6 @@ class OnboardingFlowView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                t(lang, 'goalTitle'),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-              ),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -645,12 +813,6 @@ class OnboardingFlowView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                t(lang, 'questionnaire'),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-              ),
               const SizedBox(height: 14),
               // Simplified for this file length - just same dropdowns mapping to UpdateQuestionnaire event
               DropdownButtonFormField<String>(
@@ -681,12 +843,6 @@ class OnboardingFlowView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                t(lang, 'firstExpense'),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-              ),
               const SizedBox(height: 12),
               TextFormField(
                 initialValue: state.firstTxnAmount.toString(),
@@ -718,12 +874,6 @@ class OnboardingFlowView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              t(lang, 'saveProgress'),
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-            ),
             const SizedBox(height: 10),
             Text(
               lang == 'ar'
