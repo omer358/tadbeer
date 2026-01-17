@@ -65,7 +65,7 @@ class FakeLocalDataSource {
     // In a real app, we'd save the 'user' auth data too.
   }
 
-  Future<String> askCoach(String query) async {
+  Future<String> askCoach(String query, String lang) async {
     await Future.delayed(const Duration(milliseconds: 1000));
     return "This is a fake response for '$query'. Please switch to RemoteDataSource for real AI.";
   }

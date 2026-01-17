@@ -21,7 +21,7 @@ abstract class RemoteDataSource {
   Future<Goal?> getGoal();
   Future<void> saveGoal(Goal goal);
 
-  Future<String> askCoach(String query);
+  Future<String> askCoach(String query, String lang);
 }
 
 class RemoteDataSourceImpl implements RemoteDataSource {
@@ -92,10 +92,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<String> askCoach(String query) async {
+  Future<String> askCoach(String query, String lang) async {
     final response = await _dio.post(
       '/coaching/chat',
-      data: {'query': query},
+      data: {'query': query, 'lang': lang},
       options: Options(
         headers: {
           'X-User-Id': 'user-123', // Hardcoded for now as requested/demo

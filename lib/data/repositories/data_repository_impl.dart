@@ -46,5 +46,6 @@ class DataRepositoryImpl implements DataRepository {
   }) => _localDataSource.signUp(user, profile, goal, firstTxn);
 
   @override
-  Future<String> askCoach(String query) => _remoteDataSource.askCoach(query);
+  Future<String> askCoach(String query, String lang) =>
+      _remoteDataSource.askCoach(query, lang);
 }

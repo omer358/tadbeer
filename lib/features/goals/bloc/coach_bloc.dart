@@ -13,9 +13,10 @@ class LoadCoach extends CoachEvent {}
 
 class SendQuery extends CoachEvent {
   final String query;
-  const SendQuery(this.query);
+  final String lang;
+  const SendQuery(this.query, this.lang);
   @override
-  List<Object> get props => [query];
+  List<Object> get props => [query, lang];
 }
 
 class ResetChat extends CoachEvent {}
@@ -84,7 +85,7 @@ class CoachBloc extends Bloc<CoachEvent, CoachState> {
       emit(state.copyWith(messages: newMessages, status: CoachStatus.loading));
 
       try {
-        final response = await _repo.askCoach(query);
+        final response = await _repo.askCoach(query, event.lang);
         final newerMessages = List<ChatMessage>.from(state.messages)
           ..add(
             ChatMessage(

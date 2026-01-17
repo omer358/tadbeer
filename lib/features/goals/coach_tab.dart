@@ -37,8 +37,9 @@ class _CoachViewState extends State<_CoachView> {
 
   void _send() {
     final text = _controller.text.trim();
+    final lang = context.read<SettingsBloc>().state.locale.languageCode;
     if (text.isNotEmpty) {
-      context.read<CoachBloc>().add(SendQuery(text));
+      context.read<CoachBloc>().add(SendQuery(text, lang));
       _controller.clear();
     }
   }

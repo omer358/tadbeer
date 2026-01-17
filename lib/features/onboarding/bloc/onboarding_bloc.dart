@@ -208,7 +208,7 @@ class OnboardingState extends Equatable {
       password: password ?? this.password,
       name: name ?? this.name,
     );
-  }
+  }[]
 
   @override
   List<Object?> get props => [
