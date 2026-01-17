@@ -96,10 +96,11 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<String> askCoach(String query, String lang) async {
     final response = await _dio.post(
       '/coaching/chat',
-      data: {'query': query, 'lang': lang},
-      options: Options(
-        headers: {'X-User-Id': dotenv.env['API_USER_ID'] ?? 'user-123'},
-      ),
+      data: {
+        'userId': 'user-123',
+        'query': query,
+        'lang': lang,
+      },
     );
     // Assuming response is text or JSON with a field. The user didn't specify response format.
     // "response from the server using this request is the other bubble"

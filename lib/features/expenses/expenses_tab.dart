@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/data.dart';
 import '../../widgets/components.dart';
 import '../expenses/bloc/expenses_bloc.dart';
@@ -38,80 +39,142 @@ class _ExpensesTabState extends State<ExpensesTab> {
         }).toList();
 
         return ListView(
+          padding: const EdgeInsets.only(bottom: 80),
           children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
+            // Filter & Header Section
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outlineVariant.withOpacity(0.5),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SectionTitle(
+                    icon: const Icon(Icons.receipt_long_rounded, size: 18),
+                    title: t(lang, 'expenses'),
+                    right: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(
-                          child: Text(
-                            t(lang, 'expenses'),
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(fontWeight: FontWeight.w800),
-                          ),
-                        ),
-                        FilledButton.tonal(
+                        IconButton.filledTonal(
                           onPressed: () => _openStatement(context, lang),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.upload_file_outlined, size: 18),
-                              const SizedBox(width: 6),
-                              Text(t(lang, 'importStatement')),
-                            ],
-                          ),
+                          tooltip: t(lang, 'importStatement'),
+                          icon: const Icon(Icons.upload_file_rounded, size: 20),
                         ),
                         const SizedBox(width: 8),
-                        FilledButton(
-                          onPressed: () => _openAddExpense(context, lang),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.add, size: 18),
-                              const SizedBox(width: 6),
-                              Text(t(lang, 'addExpense')),
-                            ],
+                        FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                           ),
+                          onPressed: () => _openAddExpense(context, lang),
+                          icon: const Icon(Icons.add_rounded, size: 18),
+                          label: Text(t(lang, 'addExpense')),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                  ),
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
                       children: [
                         _chip(lang == 'ar' ? 'الكل' : 'All', 'all'),
+                        const SizedBox(width: 8),
                         ...categories
                             .where((c) => c.key != 'other')
                             .map(
-                              (c) => _chip(lang == 'ar' ? c.ar : c.en, c.key),
+                              (c) => Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: _chip(lang == 'ar' ? c.ar : c.en, c.key),
+                              ),
                             ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            ...filtered.take(12).map((x) {
-              return Card(
+            ).animate().fade().slideY(begin: -0.1, end: 0),
+
+            const SizedBox(height: 16),
+
+            if (filtered.isEmpty)
+              Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.inbox_rounded,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        lang == 'ar' ? 'لا توجد مصروفات' : 'No expenses found',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ).animate().fade()
+            else
+              ...filtered.map((x) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outlineVariant.withOpacity(0.5),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.02),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.05),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.sell_outlined,
+                              size: 20,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Text(
                                   x.description,
-                                  style: Theme.of(context).textTheme.titleSmall
-                                      ?.copyWith(fontWeight: FontWeight.w800),
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.w700),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -128,24 +191,29 @@ class _ExpensesTabState extends State<ExpensesTab> {
                           ),
                           Text(
                             fmtSAR(x.amount),
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(fontWeight: FontWeight.w900),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w800),
                           ),
                         ],
                       ),
                       if (x.isBnpl) ...[
-                        const SizedBox(height: 10),
-                        SoftBadge(
-                          lang == 'ar' ? 'تم اكتشاف تقسيط' : 'BNPL detected',
-                          bg: Colors.amber.withOpacity(0.18),
-                          fg: Colors.amber.shade900,
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            SoftBadge(
+                              lang == 'ar'
+                                  ? 'تم اكتشاف تقسيط'
+                                  : 'BNPL detected',
+                              bg: Colors.amber.withOpacity(0.1),
+                              fg: Colors.amber.shade900,
+                            ),
+                          ],
                         ),
                       ],
                     ],
                   ),
-                ),
-              );
-            }),
+                ).animate().fade().slideX();
+              }),
           ],
         );
       },
@@ -154,21 +222,30 @@ class _ExpensesTabState extends State<ExpensesTab> {
 
   Widget _chip(String label, String value) {
     final selected = filter == value;
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () => setState(() => filter = value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      borderRadius: BorderRadius.circular(99),
+      child: AnimatedContainer(
+        duration: 200.ms,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(99),
           color: selected
-              ? Theme.of(context).colorScheme.primaryContainer
-              : Theme.of(context).colorScheme.surfaceContainerHighest,
+              ? scheme.primary
+              : scheme.surfaceContainerHighest.withOpacity(0.5),
+          border: Border.all(
+            color: selected
+                ? scheme.primary
+                : scheme.outlineVariant.withOpacity(0.5),
+          ),
         ),
         child: Text(
           label,
-          style: Theme.of(
-            context,
-          ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: selected ? scheme.onPrimary : scheme.onSurfaceVariant,
+          ),
         ),
       ),
     );
