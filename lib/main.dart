@@ -10,8 +10,11 @@ import 'features/expenses/bloc/expenses_bloc.dart';
 import 'features/goals/bloc/goals_bloc.dart';
 import 'domain/repositories/data_repository.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await di.init();
   runApp(const SmartSpendApp());
 }

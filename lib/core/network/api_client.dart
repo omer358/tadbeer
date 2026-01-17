@@ -1,13 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class ApiClient {
   final Dio _dio;
 
   ApiClient({String? baseUrl})
     : _dio = Dio(
         BaseOptions(
-          baseUrl: baseUrl ?? 'http://192.168.100.110:8080/api',
+          baseUrl:
+              baseUrl ??
+              dotenv.env['API_BASE_URL'] ??
+              'http://192.168.100.110:8080/api',
           connectTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 10),
           headers: {'Content-Type': 'application/json'},

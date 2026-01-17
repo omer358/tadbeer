@@ -3,6 +3,7 @@ import '../../domain/entities/goal.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/entities/user.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 abstract class RemoteDataSource {
   Future<void> signUp(
@@ -97,9 +98,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       '/coaching/chat',
       data: {'query': query, 'lang': lang},
       options: Options(
-        headers: {
-          'X-User-Id': 'user-123', // Hardcoded for now as requested/demo
-        },
+        headers: {'X-User-Id': dotenv.env['API_USER_ID'] ?? 'user-123'},
       ),
     );
     // Assuming response is text or JSON with a field. The user didn't specify response format.
