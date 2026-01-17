@@ -3,6 +3,7 @@ import '../../domain/entities/transaction.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/repositories/data_repository.dart';
 import '../../domain/entities/user.dart';
+import 'dart:developer';
 import '../datasources/fake_local_data_source.dart';
 
 import 'package:dio/dio.dart';
@@ -52,6 +53,11 @@ class DataRepositoryImpl implements DataRepository {
     try {
       return await _remoteDataSource.askCoach(query, lang);
     } on DioException catch (e) {
+      log(
+        'Dio Error in askCoach: ${e.message}',
+        name: 'DataRepository',
+        error: e,
+      );
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.sendTimeout ||
           e.type == DioExceptionType.receiveTimeout) {
@@ -67,6 +73,7 @@ class DataRepositoryImpl implements DataRepository {
         throw ServerException(e.message ?? 'Unknown Error');
       }
     } catch (e) {
+      log('Error in askCoach: $e', name: 'DataRepository', error: e);
       throw ServerException(e.toString());
     }
   }

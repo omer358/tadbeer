@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:developer';
 import '../../../../domain/repositories/data_repository.dart';
 import '../../../../core/exceptions.dart';
 import '../../../../core/data.dart';
@@ -100,6 +101,7 @@ class CoachBloc extends Bloc<CoachEvent, CoachState> {
           state.copyWith(messages: newerMessages, status: CoachStatus.success),
         );
       } catch (e) {
+        log('CoachBloc Error: $e', name: 'CoachBloc', error: e);
         String errorMessage;
         if (e is ConnectionTimeoutException) {
           errorMessage = t(event.lang, 'error.timeout');
