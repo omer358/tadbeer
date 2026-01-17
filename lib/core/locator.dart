@@ -1,10 +1,13 @@
 import 'package:get_it/get_it.dart';
 import '../data/datasources/fake_local_data_source.dart';
+import '../core/network/api_client.dart';
+import '../data/datasources/remote_data_source.dart';
 import '../data/repositories/data_repository_impl.dart';
 import '../domain/repositories/data_repository.dart';
 import '../features/dashboard/bloc/dashboard_bloc.dart';
 import '../features/expenses/bloc/expenses_bloc.dart';
 import '../features/goals/bloc/goals_bloc.dart';
+import '../features/goals/bloc/coach_bloc.dart';
 import '../features/onboarding/bloc/onboarding_bloc.dart';
 import '../features/settings/bloc/settings_bloc.dart';
 
@@ -13,9 +16,15 @@ final sl = GetIt.instance;
 Future<void> init() async {
   // Data Source
   sl.registerLazySingleton(() => FakeLocalDataSource());
+  sl.registerLazySingleton(() => ApiClient());
+  sl.registerLazySingleton<RemoteDataSource>(
+    () => RemoteDataSourceImpl(sl<ApiClient>().dio),
+  );
 
   // Repository
-  sl.registerLazySingleton<DataRepository>(() => DataRepositoryImpl(sl()));
+  sl.registerLazySingleton<DataRepository>(
+    () => DataRepositoryImpl(sl(), sl<RemoteDataSource>()),
+  );
 
   // BLoCs
   // We will register these as factories so they get created fresh when needed,
@@ -34,4 +43,5 @@ Future<void> init() async {
   sl.registerLazySingleton(() => DashboardBloc(sl()));
   sl.registerLazySingleton(() => ExpensesBloc(sl()));
   sl.registerLazySingleton(() => GoalsBloc(sl()));
+  sl.registerFactory(() => CoachBloc(sl()));
 }

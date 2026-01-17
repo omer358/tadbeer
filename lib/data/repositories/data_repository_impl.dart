@@ -5,34 +5,37 @@ import '../../domain/repositories/data_repository.dart';
 import '../../domain/entities/user.dart';
 import '../datasources/fake_local_data_source.dart';
 
-class DataRepositoryImpl implements DataRepository {
-  final FakeLocalDataSource _dataSource;
+import '../datasources/remote_data_source.dart';
 
-  DataRepositoryImpl(this._dataSource);
+class DataRepositoryImpl implements DataRepository {
+  final FakeLocalDataSource _localDataSource;
+  final RemoteDataSource _remoteDataSource;
+
+  DataRepositoryImpl(this._localDataSource, this._remoteDataSource);
 
   @override
   Future<void> addTransaction(TransactionEntity transaction) =>
-      _dataSource.addTransaction(transaction);
+      _localDataSource.addTransaction(transaction);
 
   @override
-  Future<Goal?> getGoal() => _dataSource.getGoal();
+  Future<Goal?> getGoal() => _localDataSource.getGoal();
 
   @override
   Future<List<TransactionEntity>> getTransactions() =>
-      _dataSource.getTransactions();
+      _localDataSource.getTransactions();
 
   @override
-  Future<UserProfile> getUserProfile() => _dataSource.getUserProfile();
+  Future<UserProfile> getUserProfile() => _localDataSource.getUserProfile();
 
   @override
-  Future<void> saveGoal(Goal goal) => _dataSource.saveGoal(goal);
+  Future<void> saveGoal(Goal goal) => _localDataSource.saveGoal(goal);
 
   @override
   Future<void> saveUserProfile(UserProfile profile) =>
-      _dataSource.saveUserProfile(profile);
+      _localDataSource.saveUserProfile(profile);
 
   @override
-  Future<Map<String, double>> getBudgets() => _dataSource.getBudgets();
+  Future<Map<String, double>> getBudgets() => _localDataSource.getBudgets();
 
   @override
   Future<void> signUp({
@@ -40,5 +43,8 @@ class DataRepositoryImpl implements DataRepository {
     required UserProfile profile,
     required Goal goal,
     required TransactionEntity firstTxn,
-  }) => _dataSource.signUp(user, profile, goal, firstTxn);
+  }) => _localDataSource.signUp(user, profile, goal, firstTxn);
+
+  @override
+  Future<String> askCoach(String query) => _remoteDataSource.askCoach(query);
 }

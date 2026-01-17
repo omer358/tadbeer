@@ -23,4 +23,6 @@ abstract class DataRepository {
     required Goal goal,
     required TransactionEntity firstTxn,
   });
+
+  Future<String> askCoach(String query);
 }
