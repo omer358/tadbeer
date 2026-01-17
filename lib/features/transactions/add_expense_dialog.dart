@@ -23,7 +23,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
     return AlertDialog(
       title: Text(t(lang, 'addExpense')),
       content: SizedBox(
-        width: 420,
+        width: double.maxFinite,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,

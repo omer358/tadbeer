@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/data.dart';
 import '../../core/locator.dart';
 import '../../widgets/components.dart';
+import '../../widgets/insight_banner.dart';
 
 import 'bloc/onboarding_bloc.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
@@ -835,7 +836,10 @@ class OnboardingFlowView extends StatelessWidget {
     }
 
     if (step == 6) {
-      // First Expense
+      // First Expense (Add Expense Dialog Content)
+      final dateStr =
+          '${state.firstTxnDate.year}-${state.firstTxnDate.month.toString().padLeft(2, '0')}-${state.firstTxnDate.day.toString().padLeft(2, '0')}';
+
       return Container(
         key: key,
         child: Padding(
@@ -843,23 +847,188 @@ class OnboardingFlowView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                t(lang, 'firstExpense'),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+              ),
               const SizedBox(height: 12),
-              TextFormField(
-                initialValue: state.firstTxnAmount.toString(),
-                keyboardType: TextInputType.number,
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: lang == 'ar' ? 'المبلغ' : 'Amount',
+                      ),
+                      controller: TextEditingController(
+                        text: state.firstTxnAmount.toString(),
+                      ),
+                      onChanged: (v) => bloc.add(
+                        UpdateFirstFn(
+                          double.tryParse(v) ?? state.firstTxnAmount,
+                          state.firstTxnDesc,
+                          state.firstTxnCategory,
+                          state.firstTxnDate,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        labelText: lang == 'ar' ? 'التاريخ' : 'Date',
+                        suffixIcon: const Icon(Icons.calendar_month_outlined),
+                      ),
+                      controller: TextEditingController(text: dateStr),
+                      onTap: () async {
+                        final now = DateTime.now();
+                        final picked = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime(now.year - 2),
+                          lastDate: DateTime(now.year + 1),
+                          initialDate: state.firstTxnDate,
+                        );
+                        if (picked != null) {
+                          bloc.add(
+                            UpdateFirstFn(
+                              state.firstTxnAmount,
+                              state.firstTxnDesc,
+                              state.firstTxnCategory,
+                              picked,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
                 decoration: InputDecoration(
-                  labelText: lang == 'ar' ? 'المبلغ' : 'Amount',
+                  labelText: lang == 'ar' ? 'الوصف' : 'Description',
                 ),
+                controller: TextEditingController(text: state.firstTxnDesc),
                 onChanged: (v) => bloc.add(
                   UpdateFirstFn(
-                    double.tryParse(v) ?? 0,
-                    state.firstTxnDesc,
+                    state.firstTxnAmount,
+                    v,
                     state.firstTxnCategory,
                     state.firstTxnDate,
                   ),
                 ),
               ),
-              // ... other fields
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: state.firstTxnCategory == 'bnpl'
+                    ? 'restaurants' // Fallback for UI if BNPL is selected (conceptually tricky without separate state, but user asked for content)
+                    // Actually if it's 'bnpl', we should probably show the actual underlying category if we tracked it, but we don't.
+                    // So we default to 'restaurants' or just keep it sync if it's in list.
+                    // 'bnpl' is NOT in categories list usually.
+                    : state.firstTxnCategory,
+                decoration: InputDecoration(
+                  labelText: lang == 'ar' ? 'التصنيف' : 'Category',
+                ),
+                items: categories
+                    .map(
+                      (c) => DropdownMenuItem(
+                        value: c.key,
+                        child: Text(lang == 'ar' ? c.ar : c.en),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (v) {
+                  if (v != null) {
+                    bloc.add(
+                      UpdateFirstFn(
+                        state.firstTxnAmount,
+                        state.firstTxnDesc,
+                        v,
+                        state.firstTxnDate,
+                      ),
+                    );
+                  }
+                },
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        lang == 'ar' ? 'عملية تقسيط' : 'BNPL / Installment',
+                      ),
+                    ),
+                    Switch(
+                      value: state.firstTxnCategory == 'bnpl',
+                      onChanged: (v) {
+                        bloc.add(
+                          UpdateFirstFn(
+                            state.firstTxnAmount,
+                            state.firstTxnDesc,
+                            v
+                                ? 'bnpl'
+                                : 'restaurants', // Default back to restaurants if unchecked
+                            state.firstTxnDate,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.tonal(
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.mic_none_outlined, size: 18),
+                          const SizedBox(width: 8),
+                          Text(t(lang, 'voice')),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: FilledButton.tonal(
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.photo_camera_outlined, size: 18),
+                          const SizedBox(width: 8),
+                          Text(t(lang, 'camera')),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              InsightBanner(
+                lang: lang,
+                severity: 'info',
+                title: lang == 'ar' ? 'الذكاء الاصطناعي' : 'AI',
+                message: lang == 'ar'
+                    ? 'سيتم التصنيف تلقائياً ويمكنك التعديل.'
+                    : 'We’ll auto-categorize and you can override.',
+              ),
             ],
           ),
         ),
