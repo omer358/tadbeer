@@ -9,6 +9,7 @@ import '../datasources/fake_local_data_source.dart';
 import 'package:dio/dio.dart';
 import '../../core/exceptions.dart';
 import '../datasources/remote_data_source.dart';
+import '../../data/models/onboarding_models.dart';
 
 class DataRepositoryImpl implements DataRepository {
   final FakeLocalDataSource _localDataSource;
@@ -74,6 +75,36 @@ class DataRepositoryImpl implements DataRepository {
       }
     } catch (e) {
       log('Error in askCoach: $e', name: 'DataRepository', error: e);
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<OnboardingResponse> submitOnboarding(OnboardingRequest request) async {
+    try {
+      return await _remoteDataSource.submitOnboarding(request);
+    } on DioException catch (e) {
+      log(
+        'Dio Error in submitOnboarding: ${e.message}',
+        name: 'DataRepository',
+        error: e,
+      );
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        throw ConnectionTimeoutException();
+      } else if (e.type == DioExceptionType.connectionError) {
+        throw NetworkException();
+      } else if (e.type == DioExceptionType.badResponse) {
+        throw ServerException(
+          e.message ?? 'Server Error',
+          e.response?.statusCode,
+        );
+      } else {
+        throw ServerException(e.message ?? 'Unknown Error');
+      }
+    } catch (e) {
+      log('Error in submitOnboarding: $e', name: 'DataRepository', error: e);
       throw ServerException(e.toString());
     }
   }

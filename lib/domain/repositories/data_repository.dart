@@ -2,6 +2,7 @@ import '../entities/goal.dart';
 import '../entities/transaction.dart';
 import '../entities/user_profile.dart';
 import '../entities/user.dart';
+import '../../data/models/onboarding_models.dart';
 
 abstract class DataRepository {
   Future<UserProfile> getUserProfile();
@@ -25,4 +26,6 @@ abstract class DataRepository {
   });
 
   Future<String> askCoach(String query, String lang);
+
+  Future<OnboardingResponse> submitOnboarding(OnboardingRequest request);
 }

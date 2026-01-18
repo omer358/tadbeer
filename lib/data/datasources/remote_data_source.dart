@@ -4,6 +4,7 @@ import '../../domain/entities/transaction.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/entities/user.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../models/onboarding_models.dart';
 
 abstract class RemoteDataSource {
   Future<void> signUp(
@@ -23,6 +24,8 @@ abstract class RemoteDataSource {
   Future<void> saveGoal(Goal goal);
 
   Future<String> askCoach(String query, String lang);
+
+  Future<OnboardingResponse> submitOnboarding(OnboardingRequest request);
 }
 
 class RemoteDataSourceImpl implements RemoteDataSource {
@@ -96,11 +99,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<String> askCoach(String query, String lang) async {
     final response = await _dio.post(
       '/coaching/chat',
-      data: {
-        'userId': 'user-123',
-        'query': query,
-        'lang': lang,
-      },
+      data: {'userId': 'user-123', 'query': query, 'lang': lang},
     );
     // Assuming response is text or JSON with a field. The user didn't specify response format.
     // "response from the server using this request is the other bubble"
@@ -119,6 +118,12 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           response.data.toString();
     }
     return response.data.toString();
+  }
+
+  @override
+  Future<OnboardingResponse> submitOnboarding(OnboardingRequest request) async {
+    final response = await _dio.post('/onboarding', data: request.toJson());
+    return OnboardingResponse.fromJson(response.data);
   }
 
   // --- Helpers (Manual Json until we add json_serializable) ---

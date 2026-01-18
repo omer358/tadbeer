@@ -1,11 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:uuid/uuid.dart';
-import '../../../../domain/entities/goal.dart';
-import '../../../../domain/entities/transaction.dart';
 import '../../../../domain/entities/user_profile.dart';
-import '../../../../domain/entities/user.dart';
 import '../../../../domain/repositories/data_repository.dart';
+import '../../../../data/models/onboarding_models.dart';
 
 // Events
 abstract class OnboardingEvent extends Equatable {
@@ -365,53 +363,71 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     on<SignUp>((event, emit) async {
       emit(state.copyWith(status: OnboardingStatus.submitting));
 
-      final profile = UserProfile(
-        incomeAmount: state.incomeAmount,
-        incomeSource: state.incomeSource,
-        payday: state.payday,
-        fixedExpenses: state.fixedExpenses,
-        spendingScale: state.spendingScale,
-        questionnaire: {
-          'qBnpl': state.qBnpl,
-          'qDebt': state.qDebt,
-          'qAutoSave': state.qAutoSave,
-          'qNotify': state.qNotify,
-        },
-      );
+      try {
+        final userReq = UserReq(
+          name: state.name,
+          email: state.email,
+          monthlyIncome: state.incomeAmount,
+          currency: 'SAR',
+          age: 30, // Default as not collected
+          employmentStatus: state.incomeSource,
+        );
 
-      final goal = Goal(
-        id: const Uuid().v4(),
-        name: state.goalName,
-        type: state.goalType,
-        targetAmount: state.goalAmount,
-        savedAmount: 0,
-        deadlineMonths: state.goalDeadline,
-      );
+        final goalReq = GoalReq(
+          name: state.goalName,
+          targetAmount: state.goalAmount,
+          monthlySavings:
+              state.goalAmount /
+              (state.goalDeadline > 0 ? state.goalDeadline : 1),
+          deadline: DateTime.now()
+              .add(Duration(days: state.goalDeadline * 30))
+              .toIso8601String()
+              .split('T')[0],
+          type: state.goalType,
+        );
 
-      final txn = TransactionEntity(
-        id: const Uuid().v4(),
-        amount: state.firstTxnAmount,
-        description: state.firstTxnDesc,
-        category: state.firstTxnCategory,
-        date: state.firstTxnDate,
-        isBnpl: state.firstTxnCategory == 'bnpl',
-      );
+        final fixedExpensesReq = state.fixedExpenses
+            .map((e) => FixedExpenseReq(item: e.name, amount: e.amount))
+            .toList();
 
-      final user = User(
-        id: const Uuid().v4(),
-        email: state.email,
-        name: state.name,
-        password: state.password,
-      );
+        final spendingEstimationsReq = state.spendingScale.entries
+            .map((e) => SpendingEstimationReq(category: e.key, scale: e.value))
+            .toList();
 
-      await _repo.signUp(
-        user: user,
-        profile: profile,
-        goal: goal,
-        firstTxn: txn,
-      );
+        final latestExpenseReq = LatestExpenseReq(
+          id: const Uuid().v4(),
+          userId:
+              '', // Server will assign or we generate? Server response returns userId.
+          amount: state.firstTxnAmount,
+          description: state.firstTxnDesc,
+          category: state.firstTxnCategory,
+          date: state.firstTxnDate.toIso8601String().split('T')[0],
+          type: 'expense',
+          lang: 'en', // Default, maybe pass from UI if needed
+        );
 
-      emit(state.copyWith(status: OnboardingStatus.success));
+        final request = OnboardingRequest(
+          user: userReq,
+          goals: [goalReq],
+          salary: state.incomeAmount,
+          sourceOfIncome: state.incomeSource,
+          payday: state.payday,
+          fixedExpenses: fixedExpensesReq,
+          spendingEstimations: spendingEstimationsReq,
+          bnplUsage: state.qBnpl,
+          latestExpense: latestExpenseReq,
+          lang: 'en',
+        );
+
+        await _repo.submitOnboarding(request);
+
+        // You might want to store response.userId or tokens here if authentication is involved
+        // For now, just success.
+
+        emit(state.copyWith(status: OnboardingStatus.success));
+      } catch (e) {
+        emit(state.copyWith(status: OnboardingStatus.failure));
+      }
     });
   }
 }
