@@ -193,6 +193,7 @@ class DashboardData {
   final List<GoalReq> goals;
   final List<dynamic> recentTransactions;
   final Gamification gamification;
+  final SuggestionsData suggestions;
 
   DashboardData({
     required this.totalIncome,
@@ -202,6 +203,7 @@ class DashboardData {
     required this.goals,
     required this.recentTransactions,
     required this.gamification,
+    required this.suggestions,
   });
 
   factory DashboardData.fromJson(Map<String, dynamic> json) {
@@ -218,6 +220,9 @@ class DashboardData {
       recentTransactions: json['recentTransactions'] as List<dynamic>? ?? [],
       gamification: Gamification.fromJson(
         json['gamification'] as Map<String, dynamic>? ?? {},
+      ),
+      suggestions: SuggestionsData.fromJson(
+        json['suggestions'] as Map<String, dynamic>? ?? {},
       ),
     );
   }
@@ -241,6 +246,58 @@ class Gamification {
       badges:
           (json['badges'] as List<dynamic>?)
               ?.map((e) => e.toString())
+              .toList() ??
+          [],
+    );
+  }
+}
+
+class SuggestionReq {
+  final String title;
+  final String description;
+  final String type;
+
+  SuggestionReq({
+    required this.title,
+    required this.description,
+    required this.type,
+  });
+
+  factory SuggestionReq.fromJson(Map<String, dynamic> json) {
+    return SuggestionReq(
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      type: json['type'] as String? ?? 'INFO',
+    );
+  }
+}
+
+class SuggestionsData {
+  final List<SuggestionReq> coaching;
+  final List<SuggestionReq> dashboard;
+  final List<SuggestionReq> goals;
+
+  SuggestionsData({
+    required this.coaching,
+    required this.dashboard,
+    required this.goals,
+  });
+
+  factory SuggestionsData.fromJson(Map<String, dynamic> json) {
+    return SuggestionsData(
+      coaching:
+          (json['coaching'] as List?)
+              ?.map((e) => SuggestionReq.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      dashboard:
+          (json['dashboard'] as List?)
+              ?.map((e) => SuggestionReq.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      goals:
+          (json['goals'] as List?)
+              ?.map((e) => SuggestionReq.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
     );

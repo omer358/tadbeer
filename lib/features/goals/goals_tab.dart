@@ -7,6 +7,7 @@ import '../../widgets/components.dart';
 import '../../widgets/insight_banner.dart';
 import '../goals/bloc/goals_bloc.dart';
 import '../settings/bloc/settings_bloc.dart';
+import '../dashboard/bloc/dashboard_bloc.dart';
 import '../goals/add_goal_dialog.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../domain/entities/goal.dart';
@@ -199,23 +200,34 @@ class GoalsTab extends StatelessWidget {
                     title: lang == 'ar' ? 'اقتراحات' : 'Suggestions',
                   ),
                   const SizedBox(height: 10),
-                  SuggestionCard(
-                    title: lang == 'ar'
-                        ? 'خفض المطاعم 15%'
-                        : 'Reduce dining by 15%',
-                    desc: lang == 'ar'
-                        ? 'سيوفر هذا مبلغ يساعدك تصل الهدف أسرع.'
-                        : 'This saves money that moves your goal forward faster.',
-                  ).animate().fade(delay: 200.ms).slideX(),
-                  const SizedBox(height: 8),
-                  SuggestionCard(
-                    title: lang == 'ar'
-                        ? 'تجميد التقسيط الجديد'
-                        : 'Freeze new BNPL',
-                    desc: lang == 'ar'
-                        ? 'اكتفِ بالأقساط الحالية هذا الشهر.'
-                        : 'Stick to existing installments this month.',
-                  ).animate().fade(delay: 300.ms).slideX(),
+                  // Use DashboardBloc state for suggestions
+                  Builder(
+                    builder: (context) {
+                      final goalSug = context.select(
+                        (DashboardBloc b) => b.state.goalSuggestions,
+                      );
+                      if (goalSug.isEmpty) {
+                        return Text(
+                          lang == 'ar'
+                              ? 'لا توجد اقتراحات حالياً'
+                              : 'No suggestions currently.',
+                        );
+                      }
+                      return Column(
+                        children: goalSug
+                            .map(
+                              (s) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: SuggestionCard(
+                                  title: s.title,
+                                  desc: s.description,
+                                ).animate().fade().slideX(),
+                              ),
+                            )
+                            .toList(),
+                      );
+                    },
+                  ),
                 ],
               ),
             ).animate().fade(delay: 100.ms).slideY(begin: 0.1, end: 0),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/data.dart';
 import '../../widgets/components.dart';
+import '../../widgets/insight_banner.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 // import '../../widgets/charts.dart';
 import '../../features/dashboard/bloc/dashboard_bloc.dart';
@@ -262,6 +263,36 @@ class DashboardTab extends StatelessWidget {
                   .animate()
                   .fade(delay: 200.ms, duration: 500.ms)
                   .slideY(begin: 0.1, end: 0),
+
+            if (state.dashboardSuggestions.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SectionTitle(
+                        icon: const Icon(Icons.lightbulb_outline, size: 18),
+                        title: lang == 'ar' ? 'اقتراحات' : 'Suggestions',
+                      ),
+                      const SizedBox(height: 10),
+                      ...state.dashboardSuggestions.map(
+                        (s) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: InsightBanner(
+                            lang: lang,
+                            severity: s.type == 'WARNING' ? 'warning' : 'info',
+                            title: s.title,
+                            message: s.description,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ).animate().fade().slideY(),
+            ],
 
             const SizedBox(height: 12),
             Card(

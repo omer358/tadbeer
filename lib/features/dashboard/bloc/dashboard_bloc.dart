@@ -5,6 +5,8 @@ import '../../../../domain/entities/transaction.dart';
 import '../../../../domain/entities/user_profile.dart';
 import '../../../../domain/repositories/data_repository.dart';
 
+import '../../../../domain/entities/suggestion.dart';
+
 abstract class DashboardEvent extends Equatable {
   const DashboardEvent();
   @override
@@ -22,6 +24,9 @@ class DashboardState extends Equatable {
   final double income;
   final double expenses;
   final double balance;
+  final List<Suggestion> dashboardSuggestions;
+  final List<Suggestion> coachingSuggestions;
+  final List<Suggestion> goalSuggestions;
 
   const DashboardState({
     this.profile = UserProfile.empty,
@@ -32,6 +37,9 @@ class DashboardState extends Equatable {
     this.income = 0.0,
     this.expenses = 0.0,
     this.balance = 0.0,
+    this.dashboardSuggestions = const [],
+    this.coachingSuggestions = const [],
+    this.goalSuggestions = const [],
   });
 
   @override
@@ -44,6 +52,9 @@ class DashboardState extends Equatable {
     income,
     expenses,
     balance,
+    dashboardSuggestions,
+    coachingSuggestions,
+    goalSuggestions,
   ];
 }
 
@@ -61,6 +72,36 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         final g = await _repo.getGoal();
         final b = await _repo.getBudgets();
 
+        final dashboardSug = data.suggestions.dashboard
+            .map(
+              (e) => Suggestion(
+                title: e.title,
+                description: e.description,
+                type: e.type,
+              ),
+            )
+            .toList();
+
+        final coachingSug = data.suggestions.coaching
+            .map(
+              (e) => Suggestion(
+                title: e.title,
+                description: e.description,
+                type: e.type,
+              ),
+            )
+            .toList();
+
+        final goalSug = data.suggestions.goals
+            .map(
+              (e) => Suggestion(
+                title: e.title,
+                description: e.description,
+                type: e.type,
+              ),
+            )
+            .toList();
+
         emit(
           DashboardState(
             profile: p,
@@ -71,6 +112,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
             income: data.totalIncome,
             expenses: data.totalExpenses,
             balance: data.availableBalance,
+            dashboardSuggestions: dashboardSug,
+            coachingSuggestions: coachingSug,
+            goalSuggestions: goalSug,
           ),
         );
       } catch (e) {

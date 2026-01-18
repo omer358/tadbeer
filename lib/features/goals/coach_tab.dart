@@ -1,16 +1,15 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../core/data.dart';
+
 import '../../core/locator.dart';
+import '../../widgets/insight_banner.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/dashboard/bloc/dashboard_bloc.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
 import 'bloc/coach_bloc.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'dart:io';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -109,32 +108,16 @@ class _CoachViewState extends State<_CoachView> {
     final lang = context.select(
       (SettingsBloc b) => b.state.locale.languageCode,
     );
+    // 3. Suggestions from DashboardBloc
+    final coachSuggestions = context.select(
+      (DashboardBloc b) => b.state.coachingSuggestions,
+    );
 
-    // Reuse old logic for summary header
-    final dbState = context.select((DashboardBloc b) => b.state);
-    final variable = dbState.balance;
-    final bnpl = 0.0;
-    final ratio = variable <= 0 ? 0 : bnpl / variable;
-    final saved = dbState.goal?.savedAmount ?? 0;
-    final target = dbState.goal?.targetAmount ?? 1;
-    final deadline = dbState.goal?.deadlineMonths ?? 12;
-    final req = ((target - saved) / math.max(1, deadline)).round();
-
-    final suggestions = <String>[
-      ratio > 0.3
-          ? (lang == 'ar'
-                ? 'أوقف أي تقسيط جديد لمدة 30 يوم.'
-                : 'Freeze new BNPL for 30 days.')
-          : (lang == 'ar'
-                ? 'حافظ على التقسيط تحت 30%.'
-                : 'Keep BNPL under 30%.'),
-      lang == 'ar'
-          ? 'للوصول لهدفك: ادخر ${fmtSAR(req)} شهرياً.'
-          : 'To hit your goal: save ${fmtSAR(req)} monthly.',
-      lang == 'ar'
-          ? 'ابدأ بالأكبر تأثيراً: مطاعم + توصيل + تقسيط.'
-          : 'Start with the biggest levers: dining + delivery + BNPL.',
-    ];
+    // If suggestions are available, use them. Else empty list or fallback.
+    // The UI handles whatever list is passed.
+    // If we want to strictly use only backend suggestions:
+    // final suggestions = coachSuggestions.map((s) => '${s.title}: ${s.description}').toList();
+    // But existing UI expects strings.
 
     return Column(
       children: [
@@ -190,33 +173,29 @@ class _CoachViewState extends State<_CoachView> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            ...suggestions.map(
-                              (s) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      '• ',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        s,
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.bodyMedium,
-                                      ),
-                                    ),
-                                  ],
+                            if (coachSuggestions.isEmpty)
+                              Text(
+                                lang == 'ar'
+                                    ? 'لا توجد اقتراحات حالياً'
+                                    : 'No suggestions currently.',
+                              )
+                            else
+                              ...coachSuggestions.map(
+                                (s) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: InsightBanner(
+                                    lang: lang,
+                                    severity: s.type == "WARNING"
+                                        ? 'warning'
+                                        : 'info',
+                                    title: s.title,
+                                    message: s.description,
+                                  ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
-                      ).animate().fade().slideY(begin: -0.2, end: 0),
+                      ).animate().fade().slideY(),
                     );
                   }
 
