@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+
 import 'package:lottie/lottie.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/data.dart';
@@ -67,33 +69,40 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                 left: -150,
                 bottom: -600,
                 child: Opacity(
-                  opacity: 0.4,
-                  child: Container(
-                    transform: Matrix4.identity()..rotateZ(-1.57),
-                    width: 550,
-                    height: 550,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          child: Container(
-                            width: 550,
-                            height: 550,
-                            decoration: const ShapeDecoration(
-                              gradient: RadialGradient(
-                                center: Alignment(0.26, 0.90),
-                                radius: 0.75,
-                                colors: [
-                                  Color(0xBFEAE0C7), // ~75% instead of 100%
-                                  Color(0x00EAE0C7),
-                                ],
+                  opacity: 0.20,
+                  child: ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                    child: Container(
+                      transform: Matrix4.identity()
+                        ..translate(0.0, 0.0)
+                        ..rotateZ(-1.57),
+                      width: 519,
+                      height: 519,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Container(
+                              width: 519,
+                              height: 519,
+                              decoration: ShapeDecoration(
+                                gradient: RadialGradient(
+                                  center: const Alignment(0.26, 0.69),
+                                  radius: 0.8,
+                                  colors: [
+                                    Theme.of(context).colorScheme.primary,
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.0),
+                                  ],
+                                ),
+                                shape: const OvalBorder(),
                               ),
-                              shape: OvalBorder(),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -235,7 +244,7 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
               child: Container(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                 decoration: ShapeDecoration(
-                  color: Theme.of(context).colorScheme.tertiary,
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -243,7 +252,7 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                 child: Text(
                   text,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onTertiary,
+                    color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.w500,
                     height: 1.40,
                   ),

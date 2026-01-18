@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 // Premium Color Palette
 class AppColors {
-  static const primary = Color(0xFF984722); // Rust
-  static const primaryVariant = Color(0xFF6D3014);
+  static const primary = Color(0xFF0D5CA1); // Deep Blue
+  static const primaryVariant = Color(0xFF084175); // Darker Deep Blue
   static const secondary = Color(0xFF9DB8B7); // Muted Teal
   static const tertiary = Color(0xFFEAE0C7); // Beige
   static const accent = Color(0xFFEAE0C7);
