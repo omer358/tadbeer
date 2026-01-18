@@ -79,109 +79,130 @@ class _CoachViewState extends State<_CoachView> {
 
     return Column(
       children: [
-        // Summary Header
-        Container(
-          padding: const EdgeInsets.all(16),
-          color: Theme.of(context).colorScheme.surface,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: Theme.of(
-                  context,
-                ).colorScheme.outlineVariant.withOpacity(0.5),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.auto_awesome,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      lang == 'ar' ? 'ملخص سريع' : 'Quick summary',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                ...suggestions.map(
-                  (s) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '• ',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Expanded(
-                          child: Text(
-                            s,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ).animate().fade().slideY(begin: -0.2, end: 0),
-        ),
-
-        // Chat List
+        // Chat List (containing Summary)
         Expanded(
           child: BlocBuilder<CoachBloc, CoachState>(
             builder: (context, state) {
-              if (state.messages.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.chat_bubble_outline_rounded,
-                        size: 48,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        lang == 'ar'
-                            ? 'كيف يمكنني مساعدتك اليوم؟'
-                            : 'How can I help you today?',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ).animate().fade().scale(),
-                );
-              }
+              final isLoading = state.status == CoachStatus.loading;
+              final msgCount = state.messages.length;
+              // Items: Summary + (EmptyState OR Messages) + (LoadingIndicator)
+              final itemCount =
+                  1 + (msgCount == 0 ? 1 : msgCount) + (isLoading ? 1 : 0);
+
               return ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                itemCount:
-                    state.messages.length +
-                    (state.status == CoachStatus.loading ? 1 : 0),
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                itemCount: itemCount,
                 itemBuilder: (context, index) {
-                  if (index >= state.messages.length) {
+                  // 1. Summary Header
+                  if (index == 0) {
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      color: Theme.of(context).colorScheme.surface,
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outlineVariant.withOpacity(0.5),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.auto_awesome,
+                                  size: 20,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  lang == 'ar' ? 'ملخص سريع' : 'Quick summary',
+                                  style: Theme.of(context).textTheme.titleSmall
+                                      ?.copyWith(fontWeight: FontWeight.w900),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            ...suggestions.map(
+                              (s) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      '• ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        s,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ).animate().fade().slideY(begin: -0.2, end: 0),
+                    );
+                  }
+
+                  // 2. Empty State
+                  if (msgCount == 0 && index == 1) {
+                    return Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.chat_bubble_outline_rounded,
+                            size: 48,
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            lang == 'ar'
+                                ? 'كيف يمكنني مساعدتك اليوم؟'
+                                : 'How can I help you today?',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ],
+                      ).animate().fade().scale(),
+                    );
+                  }
+
+                  // Adjust index for messages (subtract 1 for summary)
+                  final msgIndex = index - 1;
+
+                  // 3. Typing Indicator
+                  if (isLoading && msgIndex == msgCount) {
                     return Align(
                       alignment: AlignmentDirectional.centerStart,
                       child: Container(
-                        margin: const EdgeInsets.only(bottom: 12),
+                        margin: const EdgeInsets.only(
+                          bottom: 12,
+                          left: 16,
+                          right: 16,
+                        ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
@@ -198,13 +219,19 @@ class _CoachViewState extends State<_CoachView> {
                       ),
                     ).animate().fade().slideX(begin: -0.1, end: 0);
                   }
-                  final msg = state.messages[index];
+
+                  // 4. Chat Message
+                  final msg = state.messages[msgIndex];
                   return Align(
                     alignment: msg.isUser
                         ? AlignmentDirectional.centerEnd
                         : AlignmentDirectional.centerStart,
                     child: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
+                      margin: const EdgeInsets.only(
+                        bottom: 12,
+                        left: 16,
+                        right: 16,
+                      ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
