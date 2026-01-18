@@ -61,75 +61,116 @@ class DashboardTab extends StatelessWidget {
             // InsightBanner( ... ),
             const SizedBox(height: 12),
 
-            Row(
-              children: [
-                Expanded(
-                  child: StatCard(
-                    label: t(lang, 'income'),
-                    value: fmtSAR(income),
-                    sub: '${t(lang, 'fixed')}: ${fmtSAR(fixed)}',
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: StatCard(
+                      label: t(lang, 'income'),
+                      value: fmtSAR(income),
+                      sub: '${t(lang, 'fixed')}: ${fmtSAR(fixed)}',
+                      imagePath: 'assets/incom.png',
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: StatCard(
-                    label: t(lang, 'spent'),
-                    value: fmtSAR(variableSpent),
-                    sub: '${t(lang, 'bnpl')}: ${fmtSAR(bnplSpent)}',
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: StatCard(
+                      label: t(lang, 'spent'),
+                      value: fmtSAR(variableSpent),
+                      sub: '${t(lang, 'bnpl')}: ${fmtSAR(bnplSpent)}',
+                      imagePath: 'assets/total_spending.png',
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ).animate().fade(duration: 500.ms).slideY(begin: 0.1, end: 0),
             const SizedBox(height: 10),
-            Row(
-                  children: [
-                    Expanded(
-                      child: StatCard(
-                        label: t(lang, 'safeToSpend'),
-                        value: fmtSAR(safe),
-                        sub: safe < 0
-                            ? (lang == 'ar' ? 'تجاوزت الحد' : 'Over budget')
-                            : (lang == 'ar' ? 'ضمن الحدود' : 'Within limits'),
+            IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: StatCard(
+                          label: t(lang, 'safeToSpend'),
+                          value: fmtSAR(safe),
+                          sub: safe < 0
+                              ? (lang == 'ar' ? 'تجاوزت الحد' : 'Over budget')
+                              : (lang == 'ar' ? 'ضمن الحدود' : 'Within limits'),
+                          imagePath: 'assets/remain_balance.png',
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outlineVariant.withOpacity(0.5),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.03),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                t(lang, 'importStatement'),
-                                style: Theme.of(context).textTheme.labelSmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Align(
+                                    alignment: AlignmentDirectional.centerStart,
+                                    child: Image.asset(
+                                      'assets/bank_statement.png',
+                                      height: 28,
+                                      width: 28,
                                     ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    t(lang, 'bankStatement'),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 12),
                               FilledButton.tonal(
                                 onPressed: () => _openStatement(context, lang),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.upload_file_outlined,
-                                      size: 18,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(t(lang, 'upload')),
-                                  ],
+                                style: FilledButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  minimumSize: const Size(0, 36),
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(t(lang, 'importStatement')),
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 )
                 .animate()
                 .fade(delay: 100.ms, duration: 500.ms)

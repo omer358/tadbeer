@@ -98,11 +98,14 @@ class StatCard extends StatelessWidget {
   final String label;
   final String value;
   final String sub;
+  final String? imagePath;
+
   const StatCard({
     super.key,
     required this.label,
     required this.value,
     required this.sub,
+    this.imagePath,
   });
 
   @override
@@ -125,20 +128,33 @@ class StatCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (imagePath != null) ...[
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Image.asset(
+                imagePath!,
+                height: 28,
+                width: 28,
+                errorBuilder: (c, e, s) => const SizedBox(height: 28),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           Text(
-            label.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1,
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: scheme.onSurface,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4),
           Text(
             value,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w800,
               color: scheme.onSurface,
+              fontSize: 22,
             ),
           ),
           const SizedBox(height: 8),
@@ -147,6 +163,7 @@ class StatCard extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: scheme.secondary,
               fontWeight: FontWeight.w600,
+              fontSize: 10,
             ),
           ),
         ],
