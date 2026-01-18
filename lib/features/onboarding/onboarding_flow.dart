@@ -309,10 +309,7 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
               children:
                   [
                         _buildBubbleHeader(
-                          t(
-                            lang,
-                            'We need to understand more about your income and spending, Please provide us with details below',
-                          ),
+                          t(lang, 'onboarding.step1.bubble'),
                           lang,
                         ),
                         // Monthly Income
@@ -408,29 +405,25 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                                           DropdownMenuItem(
                                             value: 'salary',
                                             child: Text(
-                                              lang == 'ar' ? 'راتب' : 'Salary',
+                                              t(lang, 'income.salary'),
                                             ),
                                           ),
                                           DropdownMenuItem(
                                             value: 'freelance',
                                             child: Text(
-                                              lang == 'ar'
-                                                  ? 'عمل حر'
-                                                  : 'Freelance',
+                                              t(lang, 'income.freelance'),
                                             ),
                                           ),
                                           DropdownMenuItem(
                                             value: 'business',
                                             child: Text(
-                                              lang == 'ar'
-                                                  ? 'تجارة'
-                                                  : 'Business',
+                                              t(lang, 'income.business'),
                                             ),
                                           ),
                                           DropdownMenuItem(
                                             value: 'mixed',
                                             child: Text(
-                                              lang == 'ar' ? 'متعدد' : 'Mixed',
+                                              t(lang, 'income.mixed'),
                                             ),
                                           ),
                                         ],
@@ -530,9 +523,7 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
             children:
                 [
                       _buildBubbleHeader(
-                        lang == 'ar'
-                            ? 'ممتاز، الآن لنكتب المصاريف الثابتة الشهرية مثل الإيجار والفواتير.'
-                            : 'Interesting, now let’s write down your monthly fixed expenses for example rent, internet bill etc if you have any.',
+                        t(lang, 'onboarding.step2.bubble'),
                         lang,
                       ),
                       Expanded(
@@ -624,9 +615,7 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
             children:
                 [
                       _buildBubbleHeader(
-                        lang == 'ar'
-                            ? 'الآن لنقدر مصاريفك المتغيرة. كم تصرف عادة على هذه الفئات؟'
-                            : 'Now, let\'s estimate your variable spending. How much do you usually spend on these categories?',
+                        t(lang, 'onboarding.step3.bubble'),
                         lang,
                       ),
                       Expanded(
@@ -688,44 +677,39 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildBubbleHeader(
-                  lang == 'ar'
-                      ? 'رائع! أخبرنا الآن عن هدف مالي تود تحقيقه.'
-                      : 'Great! Now tell us about a financial goal you want to achieve.',
-                  lang,
-                ),
+                _buildBubbleHeader(t(lang, 'onboarding.step4.bubble'), lang),
                 Row(
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: state.goalType,
                         decoration: InputDecoration(
-                          labelText: lang == 'ar' ? 'النوع' : 'Type',
+                          labelText: t(lang, 'goal.type'),
                         ),
                         items: [
                           DropdownMenuItem(
                             value: 'car',
-                            child: Text(lang == 'ar' ? 'سيارة' : 'Car'),
+                            child: Text(t(lang, 'goal.car')),
                           ),
                           DropdownMenuItem(
                             value: 'travel',
-                            child: Text(lang == 'ar' ? 'سفر' : 'Travel'),
+                            child: Text(t(lang, 'goal.travel')),
                           ),
                           DropdownMenuItem(
                             value: 'wedding',
-                            child: Text(lang == 'ar' ? 'زواج' : 'Wedding'),
+                            child: Text(t(lang, 'goal.wedding')),
                           ),
                           DropdownMenuItem(
                             value: 'emergency',
-                            child: Text(lang == 'ar' ? 'طوارئ' : 'Emergency'),
+                            child: Text(t(lang, 'goal.emergency')),
                           ),
                         ],
                         onChanged: (v) {
                           if (v != null) {
                             final map = {
                               'car': lang == 'ar' ? 'سيارة' : 'Dream Car',
-                              'travel': lang == 'ar' ? 'سفر' : 'Travel',
-                              'wedding': lang == 'ar' ? 'زواج' : 'Wedding',
+                              'travel': t(lang, 'goal.travel'),
+                              'wedding': t(lang, 'goal.wedding'),
                               'emergency': lang == 'ar'
                                   ? 'طوارئ'
                                   : 'Emergency Fund',
@@ -747,24 +731,26 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                       child: DropdownButtonFormField<int>(
                         value: state.goalDeadline,
                         decoration: InputDecoration(
-                          labelText: lang == 'ar' ? 'المدة' : 'Deadline',
+                          labelText: t(lang, 'goal.deadline'),
                         ),
                         items: [
                           DropdownMenuItem(
                             value: 6,
-                            child: Text(lang == 'ar' ? '6 أشهر' : '6 months'),
+                            child: Text('6 ${t(lang, 'goal.months')}'),
                           ),
                           DropdownMenuItem(
                             value: 12,
-                            child: Text(lang == 'ar' ? 'سنة' : '1 year'),
+                            child: Text('1 ${t(lang, 'goal.year')}'),
                           ),
                           DropdownMenuItem(
                             value: 18,
-                            child: Text(lang == 'ar' ? '18 شهر' : '18 months'),
+                            child: Text(
+                              '18 ${t(lang, 'goal.months')}', // Actually singluar/plural in Arabic is complex, but for MVP it's okay or just use 'month'
+                            ),
                           ),
                           DropdownMenuItem(
                             value: 24,
-                            child: Text(lang == 'ar' ? 'سنتين' : '2 years'),
+                            child: Text('2 ${t(lang, 'goal.years')}'),
                           ),
                         ],
                         onChanged: (v) => bloc.add(

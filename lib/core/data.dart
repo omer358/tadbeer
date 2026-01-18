@@ -107,6 +107,27 @@ const i18n = {
     'onboarding.s2d': 'We help you see the real cost and stay in control.',
     'onboarding.s3t': 'Personal plan + weekly coaching.',
     'onboarding.s3d': 'Set goals, track progress, and adjust with AI guidance.',
+    'onboarding.step1.bubble':
+        'We need to understand more about your income and spending, Please provide us with details below',
+    'onboarding.step2.bubble':
+        'Interesting, now let’s write down your monthly fixed expenses for example rent, internet bill etc if you have any.',
+    'onboarding.step3.bubble':
+        'Now, let\'s estimate your variable spending. How much do you usually spend on these categories?',
+    'onboarding.step4.bubble':
+        'Great! Now tell us about a financial goal you want to achieve.',
+    'income.salary': 'Salary',
+    'income.freelance': 'Freelance',
+    'income.business': 'Business',
+    'income.mixed': 'Mixed',
+    'goal.car': 'Car',
+    'goal.travel': 'Travel',
+    'goal.wedding': 'Wedding',
+    'goal.emergency': 'Emergency',
+    'goal.type': 'Type',
+    'goal.deadline': 'Deadline',
+    'goal.months': 'months',
+    'goal.year': 'year',
+    'goal.years': 'years',
     'error.timeout': 'Connection timed out. Please try again.',
     'error.noInternet': 'No internet connection. Please check your connection.',
     'error.server': 'We encountered a technical issue. Please try again later.',
@@ -176,6 +197,26 @@ const i18n = {
     'onboarding.s2d': 'نساعدك تتحكم وتوقف النزيف قبل نهاية الشهر.',
     'onboarding.s3t': 'خطة شخصية + ملخص أسبوعي.',
     'onboarding.s3d': 'حدد هدف وامشي عليه بخطوات واضحة.',
+    'onboarding.step1.bubble':
+        'نحتاج نفهم أكثر عن دخلك ومصاريفك، ياليت تعطينا تفاصيل تحت.',
+    'onboarding.step2.bubble':
+        'ممتاز، الآن لنكتب المصاريف الثابتة الشهرية مثل الإيجار والفواتير.',
+    'onboarding.step3.bubble':
+        'الآن لنقدر مصاريفك المتغيرة. كم تصرف عادة على هذه الفئات؟',
+    'onboarding.step4.bubble': 'رائع! أخبرنا الآن عن هدف مالي تود تحقيقه.',
+    'income.salary': 'راتب',
+    'income.freelance': 'عمل حر',
+    'income.business': 'تجارة',
+    'income.mixed': 'متعدد',
+    'goal.car': 'سيارة',
+    'goal.travel': 'سفر',
+    'goal.wedding': 'زواج',
+    'goal.emergency': 'طوارئ',
+    'goal.type': 'النوع',
+    'goal.deadline': 'المدة',
+    'goal.months': 'أشهر',
+    'goal.year': 'سنة',
+    'goal.years': 'سنتين',
     'error.timeout':
         'عذراً، استغرق الاتصال وقتاً طويلاً. يرجى المحاولة مرة أخرى.',
     'error.noInternet':
