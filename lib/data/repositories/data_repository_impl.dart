@@ -105,7 +105,7 @@ class DataRepositoryImpl implements DataRepository {
 
   @override
   @override
-  Future<DashboardData> fetchDashboardData() async {
+  Future<DashboardData> fetchDashboardData(String lang) async {
     final userId = await _localDataSource.getUserId();
     if (userId == null) {
       log('No User ID found for dashboard refresh', name: 'DataRepository');
@@ -113,7 +113,7 @@ class DataRepositoryImpl implements DataRepository {
     }
 
     try {
-      final dashboard = await _remoteDataSource.getDashboard(userId);
+      final dashboard = await _remoteDataSource.getDashboard(userId, lang);
 
       // Update Goals
       if (dashboard.goals.isNotEmpty) {

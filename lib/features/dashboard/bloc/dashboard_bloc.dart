@@ -13,7 +13,12 @@ abstract class DashboardEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadDashboard extends DashboardEvent {}
+class LoadDashboard extends DashboardEvent {
+  final String lang;
+  const LoadDashboard(this.lang);
+  @override
+  List<Object> get props => [lang];
+}
 
 class DashboardState extends Equatable {
   final UserProfile profile;
@@ -65,7 +70,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     on<LoadDashboard>((event, emit) async {
       emit(const DashboardState(loading: true));
       try {
-        final data = await _repo.fetchDashboardData();
+        final data = await _repo.fetchDashboardData(event.lang);
 
         final p = await _repo.getUserProfile();
         final txns = await _repo.getTransactions();

@@ -415,7 +415,9 @@ class DashboardTab extends StatelessWidget {
         isBnpl: res['bnpl'] == true,
       );
       context.read<ExpensesBloc>().add(AddExpense(txn));
-      context.read<DashboardBloc>().add(LoadDashboard()); // Refresh dashboard
+      context.read<DashboardBloc>().add(
+        LoadDashboard(lang),
+      ); // Refresh dashboard
     }
   }
 
@@ -445,7 +447,7 @@ class DashboardTab extends StatelessWidget {
         deadlineMonths: res['deadlineMonths'],
       );
       context.read<GoalsBloc>().add(AddGoal(g));
-      context.read<DashboardBloc>().add(LoadDashboard());
+      context.read<DashboardBloc>().add(LoadDashboard(lang));
     }
   }
 

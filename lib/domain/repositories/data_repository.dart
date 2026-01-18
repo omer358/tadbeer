@@ -29,7 +29,7 @@ abstract class DataRepository {
 
   Future<OnboardingResponse> submitOnboarding(OnboardingRequest request);
 
-  Future<DashboardData> fetchDashboardData();
+  Future<DashboardData> fetchDashboardData(String lang);
 
   Future<bool> hasSession();
   Future<String> uploadStatement(String filePath);

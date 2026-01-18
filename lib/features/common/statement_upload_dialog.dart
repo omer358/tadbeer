@@ -47,7 +47,7 @@ class _StatementUploadDialogState extends State<StatementUploadDialog> {
           previous.uploadStatus != current.uploadStatus,
       listener: (context, state) {
         if (state.uploadStatus == UploadStatus.success) {
-          context.read<DashboardBloc>().add(LoadDashboard());
+          context.read<DashboardBloc>().add(LoadDashboard(widget.lang));
         } else if (state.uploadStatus == UploadStatus.failure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

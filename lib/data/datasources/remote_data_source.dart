@@ -27,7 +27,7 @@ abstract class RemoteDataSource {
 
   Future<OnboardingResponse> submitOnboarding(OnboardingRequest request);
 
-  Future<DashboardData> getDashboard(String userId);
+  Future<DashboardData> getDashboard(String userId, String lang);
 
   Future<String> uploadStatement(String userId, String filePath);
 
@@ -163,10 +163,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<DashboardData> getDashboard(String userId) async {
+  Future<DashboardData> getDashboard(String userId, String lang) async {
     final response = await _dio.get(
       '/dashboard',
-      options: Options(headers: {'X-User-Id': userId}),
+      options: Options(headers: {'X-User-Id': userId, 'X-Lang-Pref': lang}),
     );
     return DashboardData.fromJson(response.data);
   }

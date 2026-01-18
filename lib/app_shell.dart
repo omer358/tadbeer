@@ -29,13 +29,15 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     // Load initial data
-    context.read<DashboardBloc>().add(LoadDashboard());
+    final lang = context.read<SettingsBloc>().state.locale.languageCode;
+    context.read<DashboardBloc>().add(LoadDashboard(lang));
     context.read<ExpensesBloc>().add(LoadExpenses());
     context.read<GoalsBloc>().add(LoadGoals());
   }
 
   void _refresh() {
-    context.read<DashboardBloc>().add(LoadDashboard());
+    final lang = context.read<SettingsBloc>().state.locale.languageCode;
+    context.read<DashboardBloc>().add(LoadDashboard(lang));
     context.read<ExpensesBloc>().add(LoadExpenses());
     context.read<GoalsBloc>().add(LoadGoals());
   }
