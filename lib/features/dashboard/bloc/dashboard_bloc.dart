@@ -19,6 +19,9 @@ class DashboardState extends Equatable {
   final Goal? goal;
   final Map<String, double> budgets;
   final bool loading;
+  final double income;
+  final double expenses;
+  final double balance;
 
   const DashboardState({
     this.profile = UserProfile.empty,
@@ -26,12 +29,10 @@ class DashboardState extends Equatable {
     this.goal,
     this.budgets = const {},
     this.loading = true,
+    this.income = 0.0,
+    this.expenses = 0.0,
+    this.balance = 0.0,
   });
-
-  // Computed getters for UI convenience could be here or in UI
-  double get totalSpent => recentTransactions
-      .where((t) => t.direction == 'debit')
-      .fold(0, (sum, t) => sum + t.amount);
 
   @override
   List<Object?> get props => [
@@ -40,6 +41,9 @@ class DashboardState extends Equatable {
     goal,
     budgets,
     loading,
+    income,
+    expenses,
+    balance,
   ];
 }
 
@@ -50,6 +54,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     on<LoadDashboard>((event, emit) async {
       emit(const DashboardState(loading: true));
       try {
+        final data = await _repo.fetchDashboardData();
+
         final p = await _repo.getUserProfile();
         final txns = await _repo.getTransactions();
         final g = await _repo.getGoal();
@@ -62,6 +68,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
             goal: g,
             budgets: b,
             loading: false,
+            income: data.totalIncome,
+            expenses: data.totalExpenses,
+            balance: data.availableBalance,
           ),
         );
       } catch (e) {

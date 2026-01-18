@@ -26,6 +26,10 @@ abstract class RemoteDataSource {
   Future<String> askCoach(String query, String lang);
 
   Future<OnboardingResponse> submitOnboarding(OnboardingRequest request);
+
+  Future<DashboardData> getDashboard(String userId);
+
+  Future<String> uploadStatement(String userId, String filePath);
 }
 
 class RemoteDataSourceImpl implements RemoteDataSource {
@@ -124,6 +128,29 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   Future<OnboardingResponse> submitOnboarding(OnboardingRequest request) async {
     final response = await _dio.post('/onboarding', data: request.toJson());
     return OnboardingResponse.fromJson(response.data);
+  }
+
+  @override
+  Future<DashboardData> getDashboard(String userId) async {
+    final response = await _dio.get(
+      '/dashboard',
+      options: Options(headers: {'X-User-Id': userId}),
+    );
+    return DashboardData.fromJson(response.data);
+  }
+
+  @override
+  Future<String> uploadStatement(String userId, String filePath) async {
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+    });
+
+    final response = await _dio.post(
+      '/expenses/upload-statement',
+      queryParameters: {'userId': userId},
+      data: formData,
+    );
+    return response.data.toString();
   }
 
   // --- Helpers (Manual Json until we add json_serializable) ---

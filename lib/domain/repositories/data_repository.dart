@@ -28,4 +28,9 @@ abstract class DataRepository {
   Future<String> askCoach(String query, String lang);
 
   Future<OnboardingResponse> submitOnboarding(OnboardingRequest request);
+
+  Future<DashboardData> fetchDashboardData();
+
+  Future<bool> hasSession();
+  Future<String> uploadStatement(String filePath);
 }

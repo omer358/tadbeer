@@ -80,9 +80,82 @@ class DataRepositoryImpl implements DataRepository {
   }
 
   @override
+  @override
+  Future<DashboardData> fetchDashboardData() async {
+    final userId = await _localDataSource.getUserId();
+    if (userId == null) {
+      log('No User ID found for dashboard refresh', name: 'DataRepository');
+      throw ServerException('User ID not found');
+    }
+
+    try {
+      final dashboard = await _remoteDataSource.getDashboard(userId);
+
+      // Update Goals
+      if (dashboard.goals.isNotEmpty) {
+        final goalReq = dashboard.goals.first;
+        final goal = Goal(
+          id: 'goal_${DateTime.now().millisecondsSinceEpoch}',
+          name: goalReq.name,
+          type: goalReq.type,
+          targetAmount: goalReq.targetAmount,
+          savedAmount: 0,
+          deadlineMonths: int.tryParse(goalReq.deadline) ?? 12,
+        );
+        await _localDataSource.saveGoal(goal);
+      }
+
+      // Update Transactions
+      for (var tRaw in dashboard.recentTransactions) {
+        if (tRaw is Map<String, dynamic>) {
+          final map = tRaw;
+          final txn = TransactionEntity(
+            id: map['id'] ?? 'txn_${DateTime.now().millisecondsSinceEpoch}',
+            amount: (map['amount'] as num).toDouble(),
+            description: map['description'] ?? '',
+            category: map['category'] ?? 'General',
+            date: DateTime.tryParse(map['date'] ?? '') ?? DateTime.now(),
+            direction: map['type'] == 'income' ? 'credit' : 'debit',
+          );
+          await _localDataSource.addTransaction(txn);
+        }
+      }
+      return dashboard;
+    } catch (e) {
+      log('Error refreshing dashboard: $e', name: 'DataRepository', error: e);
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
   Future<OnboardingResponse> submitOnboarding(OnboardingRequest request) async {
     try {
-      return await _remoteDataSource.submitOnboarding(request);
+      final response = await _remoteDataSource.submitOnboarding(request);
+
+      // Save UserID for session
+      await _localDataSource.saveUserId(response.userId);
+
+      // Do NOT persist valid dashboard data here, forcing Dashboard screen to fetch it.
+      // However, we MUST persist UserProfile because /dashboard doesn't return it!
+      // If we don't save Profile here, the app might crash if it tries to read Profile.
+      // So I will persist Profile here, but NOT Goals/Transactions.
+
+      final userProfile = UserProfile(
+        incomeAmount: request.salary,
+        incomeSource: request.sourceOfIncome,
+        payday: request.payday,
+        fixedExpenses: request.fixedExpenses
+            .map((e) => FixedExpense(name: e.item, amount: e.amount))
+            .toList(),
+        spendingScale: {
+          for (var e in request.spendingEstimations) e.category: e.scale,
+        },
+        questionnaire: {},
+        currency: request.user.currency,
+      );
+      await _localDataSource.saveUserProfile(userProfile);
+
+      return response;
     } on DioException catch (e) {
       log(
         'Dio Error in submitOnboarding: ${e.message}',
@@ -107,5 +180,25 @@ class DataRepositoryImpl implements DataRepository {
       log('Error in submitOnboarding: $e', name: 'DataRepository', error: e);
       throw ServerException(e.toString());
     }
+  }
+
+  @override
+  Future<String> uploadStatement(String filePath) async {
+    final userId = await _localDataSource.getUserId();
+    if (userId == null) {
+      throw ServerException('User ID not found');
+    }
+    try {
+      return await _remoteDataSource.uploadStatement(userId, filePath);
+    } catch (e) {
+      log('Error uploading statement: $e', name: 'DataRepository', error: e);
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<bool> hasSession() async {
+    final uid = await _localDataSource.getUserId();
+    return uid != null;
   }
 }

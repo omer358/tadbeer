@@ -206,16 +206,18 @@ class DashboardData {
 
   factory DashboardData.fromJson(Map<String, dynamic> json) {
     return DashboardData(
-      totalIncome: (json['totalIncome'] as num).toDouble(),
-      totalExpenses: (json['totalExpenses'] as num).toDouble(),
-      availableBalance: (json['availableBalance'] as num).toDouble(),
-      financialInsight: json['financialInsight'] as String,
-      goals: (json['goals'] as List<dynamic>)
-          .map((e) => GoalReq.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      recentTransactions: json['recentTransactions'] as List<dynamic>,
+      totalIncome: (json['totalBudget'] as num?)?.toDouble() ?? 0.0,
+      totalExpenses: (json['totalSpent'] as num?)?.toDouble() ?? 0.0,
+      availableBalance: (json['remaining'] as num?)?.toDouble() ?? 0.0,
+      financialInsight: json['financialInsight'] as String? ?? '',
+      goals:
+          (json['goals'] as List<dynamic>?)
+              ?.map((e) => GoalReq.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      recentTransactions: json['recentTransactions'] as List<dynamic>? ?? [],
       gamification: Gamification.fromJson(
-        json['gamification'] as Map<String, dynamic>,
+        json['gamification'] as Map<String, dynamic>? ?? {},
       ),
     );
   }
@@ -234,11 +236,13 @@ class Gamification {
 
   factory Gamification.fromJson(Map<String, dynamic> json) {
     return Gamification(
-      score: json['score'] as int,
-      streak: json['streak'] as int,
-      badges: (json['badges'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
+      score: (json['score'] as num?)?.toInt() ?? 0,
+      streak: (json['streak'] as num?)?.toInt() ?? 0,
+      badges:
+          (json['badges'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 }

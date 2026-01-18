@@ -36,18 +36,15 @@ class DashboardTab extends StatelessWidget {
         final stateBudgets = state.budgets;
 
         // Calculations
-        final income = profile.incomeAmount;
+        final income = state.income;
         final fixed = profile.totalFixed;
+        final variableSpent = state.expenses;
+        final safe = state.balance;
 
-        double variableSpent = 0;
         double bnplSpent = 0;
         for (final t in txns) {
-          if (t.direction != 'debit') continue;
-          variableSpent += t.amount;
           if (t.isBnpl) bnplSpent += t.amount;
         }
-
-        final safe = income - fixed - variableSpent;
 
         final saved = goal?.savedAmount ?? 0;
         final target = goal?.targetAmount ?? 1;
