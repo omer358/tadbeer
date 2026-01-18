@@ -10,6 +10,7 @@ import 'bloc/onboarding_bloc.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
 import '../../app_shell.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../features/auth/login_screen.dart';
 
 class OnboardingFlow extends StatelessWidget {
   const OnboardingFlow({super.key});
@@ -279,7 +280,11 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                         const SizedBox(height: 12),
                         OutlinedButton(
                           onPressed: () {
-                            // TODO: Implement already a user flow
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const LoginScreen(),
+                              ),
+                            );
                           },
                           child: Text(
                             lang == 'ar' ? 'لديك حساب؟' : 'Already a user?',
