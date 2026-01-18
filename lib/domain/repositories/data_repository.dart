@@ -34,4 +34,8 @@ abstract class DataRepository {
   Future<bool> hasSession();
   Future<String> uploadStatement(String filePath);
   Future<String> chatWithVoice(String filePath, String lang);
+  Future<List<TransactionEntity>> addExpenseByVoice(
+    String filePath,
+    String lang,
+  );
 }

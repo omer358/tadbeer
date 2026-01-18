@@ -235,6 +235,31 @@ class DataRepositoryImpl implements DataRepository {
   }
 
   @override
+  Future<List<TransactionEntity>> addExpenseByVoice(
+    String filePath,
+    String lang,
+  ) async {
+    final userId = await _localDataSource.getUserId();
+    if (userId == null) {
+      throw ServerException('User ID not found');
+    }
+    try {
+      final txns = await _remoteDataSource.addExpenseByVoice(
+        userId,
+        filePath,
+        lang,
+      );
+      for (var t in txns) {
+        await _localDataSource.addTransaction(t);
+      }
+      return txns;
+    } catch (e) {
+      log('Error using voice expense: $e', name: 'DataRepository', error: e);
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
   Future<bool> hasSession() async {
     final uid = await _localDataSource.getUserId();
     return uid != null;

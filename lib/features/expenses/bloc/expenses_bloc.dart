@@ -23,6 +23,12 @@ class UploadStatement extends ExpensesEvent {
   const UploadStatement(this.filePath);
 }
 
+class AddExpenseByVoice extends ExpensesEvent {
+  final String filePath;
+  final String lang;
+  const AddExpenseByVoice(this.filePath, this.lang);
+}
+
 class ExpensesState extends Equatable {
   final List<TransactionEntity> transactions;
   final bool loading;
@@ -72,6 +78,22 @@ class ExpensesBloc extends Bloc<ExpensesEvent, ExpensesState> {
     on<AddExpense>((event, emit) async {
       await _repo.addTransaction(event.transaction);
       add(LoadExpenses());
+    });
+
+    on<AddExpenseByVoice>((event, emit) async {
+      emit(state.copyWith(uploadStatus: UploadStatus.loading));
+      try {
+        await _repo.addExpenseByVoice(event.filePath, event.lang);
+        emit(state.copyWith(uploadStatus: UploadStatus.success));
+        add(LoadExpenses());
+      } catch (e) {
+        emit(
+          state.copyWith(
+            uploadStatus: UploadStatus.failure,
+            uploadMessage: e.toString(),
+          ),
+        );
+      }
     });
 
     on<UploadStatement>((event, emit) async {

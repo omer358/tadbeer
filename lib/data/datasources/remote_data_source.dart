@@ -32,6 +32,12 @@ abstract class RemoteDataSource {
   Future<String> uploadStatement(String userId, String filePath);
 
   Future<String> chatWithVoice(String userId, String filePath, String lang);
+
+  Future<List<TransactionEntity>> addExpenseByVoice(
+    String userId,
+    String filePath,
+    String lang,
+  );
 }
 
 class RemoteDataSourceImpl implements RemoteDataSource {
@@ -195,6 +201,28 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       data: formData,
     );
     return response.data.toString();
+  }
+
+  @override
+  Future<List<TransactionEntity>> addExpenseByVoice(
+    String userId,
+    String filePath,
+    String lang,
+  ) async {
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+    });
+
+    final response = await _dio.post(
+      '/expenses/voice',
+      options: Options(headers: {'X-User-Id': userId, 'X-Lang-Pref': lang}),
+      data: formData,
+    );
+    final data = response.data;
+    if (data is List) {
+      return data.map((e) => _txnFromJson(e)).toList();
+    }
+    return [];
   }
 
   // --- Helpers (Manual Json until we add json_serializable) ---
