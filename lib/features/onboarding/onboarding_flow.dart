@@ -9,6 +9,7 @@ import '../../widgets/insight_banner.dart';
 import 'bloc/onboarding_bloc.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
 import '../../app_shell.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class OnboardingFlow extends StatelessWidget {
   const OnboardingFlow({super.key});
@@ -201,6 +202,43 @@ class OnboardingFlowView extends StatelessWidget {
     );
   }
 
+  Widget _buildBubbleHeader(String text, String lang) {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                decoration: ShapeDecoration(
+                  color: const Color(0xFFEDE3CB),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  text,
+                  style: const TextStyle(
+                    color: Color(0xFF1E1E1E),
+                    fontSize: 16,
+                    fontFamily: 'Quicksand',
+                    fontWeight: FontWeight.w500,
+                    height: 1.40,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Image.asset('assets/bubble.png', height: 28),
+          ],
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
   Widget _buildStep(BuildContext context, OnboardingState state, String lang) {
     final step = state.step;
     final key = ValueKey('step_$step');
@@ -218,19 +256,25 @@ class OnboardingFlowView extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                FilledButton(
-                  onPressed: () => bloc.add(NextStep()),
-                  child: Text(t(lang, 'startNow')),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton(
-                  onPressed: () {
-                    // TODO: Implement already a user flow
-                  },
-                  child: Text(lang == 'ar' ? 'لديك حساب؟' : 'Already a user?'),
-                ),
-              ],
+              children:
+                  [
+                        FilledButton(
+                          onPressed: () => bloc.add(NextStep()),
+                          child: Text(t(lang, 'startNow')),
+                        ),
+                        const SizedBox(height: 12),
+                        OutlinedButton(
+                          onPressed: () {
+                            // TODO: Implement already a user flow
+                          },
+                          child: Text(
+                            lang == 'ar' ? 'لديك حساب؟' : 'Already a user?',
+                          ),
+                        ),
+                      ]
+                      .animate(interval: 100.ms)
+                      .fade(duration: 400.ms)
+                      .slideY(begin: 0.1, curve: Curves.easeOut),
             ),
           ),
         ],
@@ -245,231 +289,216 @@ class OnboardingFlowView extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Message Bubble
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        decoration: ShapeDecoration(
-                          color: const Color(0xFFEDE3CB),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Text(
+              children:
+                  [
+                        _buildBubbleHeader(
                           t(
                             lang,
                             'We need to understand more about your income and spending, Please provide us with details below',
                           ),
-                          style: const TextStyle(
-                            color: Color(0xFF1E1E1E),
-                            fontSize: 16,
-                            fontFamily: 'Quicksand',
-                            fontWeight: FontWeight.w500,
-                            height: 1.40,
-                          ),
+                          lang,
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Avatar Stack (Simplified from snippet)
-                    Image.asset('assets/bubble.png', height: 28),
-                  ],
-                ),
-                const SizedBox(height: 40),
-
-                // Monthly Income
-                // Monthly Income
-                const SizedBox(height: 8),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFD9D9D9)),
-                  ),
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    style: const TextStyle(
-                      fontFamily: 'Quicksand',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF1E1E1E),
-                    ),
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      border: InputBorder.none,
-                      hintText: '12000',
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(
-                          'SAR',
-                          style: const TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF1E1E1E),
+                        // Monthly Income
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFD9D9D9)),
                           ),
-                        ),
-                      ),
-                    ),
-                    initialValue: state.incomeAmount.toString(),
-                    onChanged: (v) => bloc.add(
-                      UpdateIncome(
-                        double.tryParse(v) ?? state.incomeAmount,
-                        state.incomeSource,
-                        state.payday,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Row for Income Source and Payday
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            t(lang, 'incomeSource'),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
                             style: const TextStyle(
-                              color: Color(0xFF1E1E1E),
-                              fontSize: 16,
                               fontFamily: 'Quicksand',
+                              fontSize: 16,
                               fontWeight: FontWeight.w500,
+                              color: Color(0xFF1E1E1E),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            height: 48, // Fixed height to match design feel
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: const Color(0xFFD9D9D9),
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              border: InputBorder.none,
+                              hintText: '12000',
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  'SAR',
+                                  style: const TextStyle(
+                                    fontFamily: 'Quicksand',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF1E1E1E),
+                                  ),
+                                ),
                               ),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: state.incomeSource,
-                                isExpanded: true,
-                                icon: const Icon(Icons.arrow_drop_down),
-                                style: const TextStyle(
-                                  fontFamily: 'Quicksand',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF1E1E1E),
-                                ),
-                                items: [
-                                  DropdownMenuItem(
-                                    value: 'salary',
-                                    child: Text(
-                                      lang == 'ar' ? 'راتب' : 'Salary',
+                            initialValue: state.incomeAmount.toString(),
+                            onChanged: (v) => bloc.add(
+                              UpdateIncome(
+                                double.tryParse(v) ?? state.incomeAmount,
+                                state.incomeSource,
+                                state.payday,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Row for Income Source and Payday
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    t(lang, 'incomeSource'),
+                                    style: const TextStyle(
+                                      color: Color(0xFF1E1E1E),
+                                      fontSize: 16,
+                                      fontFamily: 'Quicksand',
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  DropdownMenuItem(
-                                    value: 'freelance',
-                                    child: Text(
-                                      lang == 'ar' ? 'عمل حر' : 'Freelance',
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    height:
+                                        48, // Fixed height to match design feel
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: const Color(0xFFD9D9D9),
+                                      ),
                                     ),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'business',
-                                    child: Text(
-                                      lang == 'ar' ? 'تجارة' : 'Business',
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
                                     ),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'mixed',
-                                    child: Text(
-                                      lang == 'ar' ? 'متعدد' : 'Mixed',
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        value: state.incomeSource,
+                                        isExpanded: true,
+                                        icon: const Icon(Icons.arrow_drop_down),
+                                        style: const TextStyle(
+                                          fontFamily: 'Quicksand',
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF1E1E1E),
+                                        ),
+                                        items: [
+                                          DropdownMenuItem(
+                                            value: 'salary',
+                                            child: Text(
+                                              lang == 'ar' ? 'راتب' : 'Salary',
+                                            ),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: 'freelance',
+                                            child: Text(
+                                              lang == 'ar'
+                                                  ? 'عمل حر'
+                                                  : 'Freelance',
+                                            ),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: 'business',
+                                            child: Text(
+                                              lang == 'ar'
+                                                  ? 'تجارة'
+                                                  : 'Business',
+                                            ),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: 'mixed',
+                                            child: Text(
+                                              lang == 'ar' ? 'متعدد' : 'Mixed',
+                                            ),
+                                          ),
+                                        ],
+                                        onChanged: (v) => bloc.add(
+                                          UpdateIncome(
+                                            state.incomeAmount,
+                                            v ?? state.incomeSource,
+                                            state.payday,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
-                                onChanged: (v) => bloc.add(
-                                  UpdateIncome(
-                                    state.incomeAmount,
-                                    v ?? state.incomeSource,
-                                    state.payday,
+                              ),
+                            ),
+                            const SizedBox(width: 24),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    t(lang, 'payday'),
+                                    style: const TextStyle(
+                                      color: Color(0xFF1E1E1E),
+                                      fontSize: 16,
+                                      fontFamily: 'Quicksand',
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            t(lang, 'payday'),
-                            style: const TextStyle(
-                              color: Color(0xFF1E1E1E),
-                              fontSize: 16,
-                              fontFamily: 'Quicksand',
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: const Color(0xFFD9D9D9),
-                              ),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: state.payday.toString(),
-                                isExpanded: true,
-                                icon: const Icon(Icons.arrow_drop_down),
-                                style: const TextStyle(
-                                  fontFamily: 'Quicksand',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF1E1E1E),
-                                ),
-                                items:
-                                    List.generate(28, (i) => (i + 1).toString())
-                                        .map(
-                                          (d) => DropdownMenuItem(
-                                            value: d,
-                                            child: Text(d),
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: const Color(0xFFD9D9D9),
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        value: state.payday.toString(),
+                                        isExpanded: true,
+                                        icon: const Icon(Icons.arrow_drop_down),
+                                        style: const TextStyle(
+                                          fontFamily: 'Quicksand',
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF1E1E1E),
+                                        ),
+                                        items:
+                                            List.generate(
+                                                  28,
+                                                  (i) => (i + 1).toString(),
+                                                )
+                                                .map(
+                                                  (d) => DropdownMenuItem(
+                                                    value: d,
+                                                    child: Text(d),
+                                                  ),
+                                                )
+                                                .toList(),
+                                        onChanged: (v) => bloc.add(
+                                          UpdateIncome(
+                                            state.incomeAmount,
+                                            state.incomeSource,
+                                            int.tryParse(v ?? '25') ?? 25,
                                           ),
-                                        )
-                                        .toList(),
-                                onChanged: (v) => bloc.add(
-                                  UpdateIncome(
-                                    state.incomeAmount,
-                                    state.incomeSource,
-                                    int.tryParse(v ?? '25') ?? 25,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                          ],
+                        ),
+                      ]
+                      .animate(interval: 50.ms)
+                      .fade(duration: 400.ms)
+                      .slideY(begin: 0.1, curve: Curves.easeOut),
             ),
           ),
         ),
@@ -483,65 +512,80 @@ class OnboardingFlowView extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 12),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: state.fixedExpenses.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, i) {
-                    final r = state.fixedExpenses[i];
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            initialValue: r.name,
-                            decoration: InputDecoration(
-                              labelText: lang == 'ar' ? 'البند' : 'Item',
-                            ),
-                            onChanged: (v) =>
-                                bloc.add(UpdateFixedExpenseName(i, v)),
-                          ),
+            children:
+                [
+                      _buildBubbleHeader(
+                        lang == 'ar'
+                            ? 'ممتاز، الآن لنكتب المصاريف الثابتة الشهرية مثل الإيجار والفواتير.'
+                            : 'Interesting, now let’s write down your monthly fixed expenses for example rent, internet bill etc if you have any.',
+                        lang,
+                      ),
+                      Expanded(
+                        child: ListView.separated(
+                          itemCount: state.fixedExpenses.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 10),
+                          itemBuilder: (context, i) {
+                            final r = state.fixedExpenses[i];
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    initialValue: r.name,
+                                    decoration: InputDecoration(
+                                      labelText: lang == 'ar'
+                                          ? 'البند'
+                                          : 'Item',
+                                    ),
+                                    onChanged: (v) =>
+                                        bloc.add(UpdateFixedExpenseName(i, v)),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                SizedBox(
+                                  width: 120,
+                                  child: TextFormField(
+                                    initialValue: r.amount.toString(),
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      labelText: lang == 'ar'
+                                          ? 'المبلغ'
+                                          : 'Amount',
+                                    ),
+                                    onChanged: (v) => bloc.add(
+                                      UpdateFixedExpenseAmount(
+                                        i,
+                                        double.tryParse(v) ?? 0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                IconButton(
+                                  onPressed: () =>
+                                      bloc.add(RemoveFixedExpense(i)),
+                                  icon: const Icon(Icons.delete_outline),
+                                ),
+                              ],
+                            );
+                          },
                         ),
-                        const SizedBox(width: 10),
-                        SizedBox(
-                          width: 120,
-                          child: TextFormField(
-                            initialValue: r.amount.toString(),
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: lang == 'ar' ? 'المبلغ' : 'Amount',
-                            ),
-                            onChanged: (v) => bloc.add(
-                              UpdateFixedExpenseAmount(
-                                i,
-                                double.tryParse(v) ?? 0,
-                              ),
-                            ),
-                          ),
+                      ),
+                      FilledButton.tonal(
+                        onPressed: () => bloc.add(const AddFixedExpense('', 0)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.add, size: 18),
+                            const SizedBox(width: 8),
+                            Text(lang == 'ar' ? 'إضافة بند' : 'Add item'),
+                          ],
                         ),
-                        const SizedBox(width: 6),
-                        IconButton(
-                          onPressed: () => bloc.add(RemoveFixedExpense(i)),
-                          icon: const Icon(Icons.delete_outline),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              FilledButton.tonal(
-                onPressed: () => bloc.add(const AddFixedExpense('', 0)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.add, size: 18),
-                    const SizedBox(width: 8),
-                    Text(lang == 'ar' ? 'إضافة بند' : 'Add item'),
-                  ],
-                ),
-              ),
-            ],
+                      ),
+                    ]
+                    .animate(interval: 100.ms)
+                    .fade(duration: 400.ms)
+                    .slideY(begin: 0.1, curve: Curves.easeOut),
           ),
         ),
       );
@@ -555,44 +599,59 @@ class OnboardingFlowView extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 12),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: keys.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, i) {
-                    final k = keys[i];
-                    final v = state.spendingScale[k] ?? 0;
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                catLabel(lang, k),
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.copyWith(fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                            SoftBadge('$v/5'),
-                          ],
+            children:
+                [
+                      _buildBubbleHeader(
+                        lang == 'ar'
+                            ? 'الآن لنقدر مصاريفك المتغيرة. كم تصرف عادة على هذه الفئات؟'
+                            : 'Now, let\'s estimate your variable spending. How much do you usually spend on these categories?',
+                        lang,
+                      ),
+                      Expanded(
+                        child: ListView.separated(
+                          itemCount: keys.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (context, i) {
+                            final k = keys[i];
+                            final v = state.spendingScale[k] ?? 0;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        catLabel(lang, k),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                      ),
+                                    ),
+                                    SoftBadge('$v/5'),
+                                  ],
+                                ),
+                                Slider(
+                                  value: v.toDouble(),
+                                  min: 0,
+                                  max: 5,
+                                  divisions: 5,
+                                  onChanged: (nv) => bloc.add(
+                                    UpdateVariableScale(k, nv.round()),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
-                        Slider(
-                          value: v.toDouble(),
-                          min: 0,
-                          max: 5,
-                          divisions: 5,
-                          onChanged: (nv) =>
-                              bloc.add(UpdateVariableScale(k, nv.round())),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
+                      ),
+                    ]
+                    .animate(interval: 100.ms)
+                    .fade(duration: 400.ms)
+                    .slideY(begin: 0.1, curve: Curves.easeOut),
           ),
         ),
       );
@@ -603,180 +662,199 @@ class OnboardingFlowView extends StatelessWidget {
         key: key,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: state.goalType,
-                      decoration: InputDecoration(
-                        labelText: lang == 'ar' ? 'النوع' : 'Type',
-                      ),
-                      items: [
-                        DropdownMenuItem(
-                          value: 'car',
-                          child: Text(lang == 'ar' ? 'سيارة' : 'Car'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'travel',
-                          child: Text(lang == 'ar' ? 'سفر' : 'Travel'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'wedding',
-                          child: Text(lang == 'ar' ? 'زواج' : 'Wedding'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'emergency',
-                          child: Text(lang == 'ar' ? 'طوارئ' : 'Emergency'),
-                        ),
-                      ],
-                      onChanged: (v) {
-                        if (v != null) {
-                          final map = {
-                            'car': lang == 'ar' ? 'سيارة' : 'Dream Car',
-                            'travel': lang == 'ar' ? 'سفر' : 'Travel',
-                            'wedding': lang == 'ar' ? 'زواج' : 'Wedding',
-                            'emergency': lang == 'ar'
-                                ? 'طوارئ'
-                                : 'Emergency Fund',
-                          };
-                          bloc.add(
-                            UpdateGoal(
-                              v,
-                              map[v] ?? state.goalName,
-                              state.goalAmount,
-                              state.goalDeadline,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DropdownButtonFormField<int>(
-                      value: state.goalDeadline,
-                      decoration: InputDecoration(
-                        labelText: lang == 'ar' ? 'المدة' : 'Deadline',
-                      ),
-                      items: [
-                        DropdownMenuItem(
-                          value: 6,
-                          child: Text(lang == 'ar' ? '6 أشهر' : '6 months'),
-                        ),
-                        DropdownMenuItem(
-                          value: 12,
-                          child: Text(lang == 'ar' ? 'سنة' : '1 year'),
-                        ),
-                        DropdownMenuItem(
-                          value: 18,
-                          child: Text(lang == 'ar' ? '18 شهر' : '18 months'),
-                        ),
-                        DropdownMenuItem(
-                          value: 24,
-                          child: Text(lang == 'ar' ? 'سنتين' : '2 years'),
-                        ),
-                      ],
-                      onChanged: (v) => bloc.add(
-                        UpdateGoal(
-                          state.goalType,
-                          state.goalName,
-                          state.goalAmount,
-                          v ?? 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                initialValue: state.goalName,
-                decoration: InputDecoration(
-                  labelText: lang == 'ar' ? 'اسم الهدف' : 'Goal name',
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildBubbleHeader(
+                  lang == 'ar'
+                      ? 'رائع! أخبرنا الآن عن هدف مالي تود تحقيقه.'
+                      : 'Great! Now tell us about a financial goal you want to achieve.',
+                  lang,
                 ),
-                onChanged: (v) => bloc.add(
-                  UpdateGoal(
-                    state.goalType,
-                    v,
-                    state.goalAmount,
-                    state.goalDeadline,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                initialValue: state.goalAmount.toString(),
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: lang == 'ar' ? 'المبلغ' : 'Target amount',
-                ),
-                onChanged: (v) => bloc.add(
-                  UpdateGoal(
-                    state.goalType,
-                    state.goalName,
-                    double.tryParse(v) ?? state.goalAmount,
-                    state.goalDeadline,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              FilledButton.tonal(
-                onPressed: () => bloc.add(RunFeasibilityCheck()),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Row(
                   children: [
-                    const Icon(Icons.auto_awesome, size: 18),
-                    const SizedBox(width: 8),
-                    Text(t(lang, 'feasibility')),
-                  ],
-                ),
-              ),
-              if (state.feasibility != null) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    ),
-                    color: (state.feasibility!['feasible'] as bool)
-                        ? Colors.green.withOpacity(0.08)
-                        : Colors.amber.withOpacity(0.12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              (state.feasibility!['feasible'] as bool)
-                                  ? (lang == 'ar' ? 'قابل للتنفيذ' : 'Feasible')
-                                  : (lang == 'ar'
-                                        ? 'غير واقعي'
-                                        : 'Not feasible'),
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.w800),
-                            ),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: state.goalType,
+                        decoration: InputDecoration(
+                          labelText: lang == 'ar' ? 'النوع' : 'Type',
+                        ),
+                        items: [
+                          DropdownMenuItem(
+                            value: 'car',
+                            child: Text(lang == 'ar' ? 'سيارة' : 'Car'),
                           ),
-                          SoftBadge(
-                            lang == 'ar'
-                                ? 'مطلوب ${state.feasibility!['monthlyRequired']} شهرياً'
-                                : '${state.feasibility!['monthlyRequired']}/mo required',
+                          DropdownMenuItem(
+                            value: 'travel',
+                            child: Text(lang == 'ar' ? 'سفر' : 'Travel'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'wedding',
+                            child: Text(lang == 'ar' ? 'زواج' : 'Wedding'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'emergency',
+                            child: Text(lang == 'ar' ? 'طوارئ' : 'Emergency'),
                           ),
                         ],
+                        onChanged: (v) {
+                          if (v != null) {
+                            final map = {
+                              'car': lang == 'ar' ? 'سيارة' : 'Dream Car',
+                              'travel': lang == 'ar' ? 'سفر' : 'Travel',
+                              'wedding': lang == 'ar' ? 'زواج' : 'Wedding',
+                              'emergency': lang == 'ar'
+                                  ? 'طوارئ'
+                                  : 'Emergency Fund',
+                            };
+                            bloc.add(
+                              UpdateGoal(
+                                v,
+                                map[v] ?? state.goalName,
+                                state.goalAmount,
+                                state.goalDeadline,
+                              ),
+                            );
+                          }
+                        },
                       ),
-                      // ... (rest of feasibility UI can stay same, just reusing state.feasibility map)
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        value: state.goalDeadline,
+                        decoration: InputDecoration(
+                          labelText: lang == 'ar' ? 'المدة' : 'Deadline',
+                        ),
+                        items: [
+                          DropdownMenuItem(
+                            value: 6,
+                            child: Text(lang == 'ar' ? '6 أشهر' : '6 months'),
+                          ),
+                          DropdownMenuItem(
+                            value: 12,
+                            child: Text(lang == 'ar' ? 'سنة' : '1 year'),
+                          ),
+                          DropdownMenuItem(
+                            value: 18,
+                            child: Text(lang == 'ar' ? '18 شهر' : '18 months'),
+                          ),
+                          DropdownMenuItem(
+                            value: 24,
+                            child: Text(lang == 'ar' ? 'سنتين' : '2 years'),
+                          ),
+                        ],
+                        onChanged: (v) => bloc.add(
+                          UpdateGoal(
+                            state.goalType,
+                            state.goalName,
+                            state.goalAmount,
+                            v ?? 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  initialValue: state.goalName,
+                  decoration: InputDecoration(
+                    labelText: lang == 'ar' ? 'اسم الهدف' : 'Goal name',
+                  ),
+                  onChanged: (v) => bloc.add(
+                    UpdateGoal(
+                      state.goalType,
+                      v,
+                      state.goalAmount,
+                      state.goalDeadline,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  initialValue: state.goalAmount.toString(),
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: lang == 'ar' ? 'المبلغ' : 'Target amount',
+                  ),
+                  onChanged: (v) => bloc.add(
+                    UpdateGoal(
+                      state.goalType,
+                      state.goalName,
+                      double.tryParse(v) ?? state.goalAmount,
+                      state.goalDeadline,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FilledButton.tonal(
+                  onPressed: () => bloc.add(RunFeasibilityCheck()),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.auto_awesome, size: 18),
+                      const SizedBox(width: 8),
+                      Text(t(lang, 'feasibility')),
                     ],
                   ),
                 ),
-              ],
-            ],
+                if (state.feasibility != null)
+                  ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outlineVariant,
+                            ),
+                            color: (state.feasibility!['feasible'] as bool)
+                                ? Colors.green.withOpacity(0.08)
+                                : Colors.amber.withOpacity(0.12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      (state.feasibility!['feasible'] as bool)
+                                          ? (lang == 'ar'
+                                                ? 'قابل للتنفيذ'
+                                                : 'Feasible')
+                                          : (lang == 'ar'
+                                                ? 'غير واقعي'
+                                                : 'Not feasible'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                    ),
+                                  ),
+                                  SoftBadge(
+                                    lang == 'ar'
+                                        ? 'مطلوب ${state.feasibility!['monthlyRequired']} شهرياً'
+                                        : '${state.feasibility!['monthlyRequired']}/mo required',
+                                  ),
+                                ],
+                              ),
+                              // ... (rest of feasibility UI can stay same, just reusing state.feasibility map)
+                            ],
+                          ),
+                        ),
+                      ]
+                      .animate(interval: 100.ms)
+                      .fade(duration: 400.ms)
+                      .slideY(begin: 0.1, curve: Curves.easeOut),
+              ].animate(interval: 100.ms).fade(duration: 400.ms).slideY(begin: 0.1, curve: Curves.easeOut),
+            ),
           ),
         ),
       );
@@ -792,23 +870,35 @@ class OnboardingFlowView extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 14),
-              // Simplified for this file length - just same dropdowns mapping to UpdateQuestionnaire event
-              DropdownButtonFormField<String>(
-                value: state.qBnpl,
-                decoration: InputDecoration(
-                  labelText: lang == 'ar'
-                      ? 'هل تستخدم التقسيط؟'
-                      : 'Do you use BNPL?',
-                ),
-                items: ['never', 'sometimes', 'often']
-                    .map((v) => DropdownMenuItem(value: v, child: Text(v)))
-                    .toList(),
-                onChanged: (v) => bloc.add(UpdateQuestionnaire(bnpl: v)),
-              ),
-              // ... other fields
-            ],
+            children:
+                [
+                      _buildBubbleHeader(
+                        lang == 'ar'
+                            ? 'اوشكنا على الانتهاء. بضعة أسئلة لنفهم طبيعتك المالية.'
+                            : 'Almost there. A few questions to better understand your financial personality.',
+                        lang,
+                      ),
+                      // Simplified for this file length - just same dropdowns mapping to UpdateQuestionnaire event
+                      DropdownButtonFormField<String>(
+                        value: state.qBnpl,
+                        decoration: InputDecoration(
+                          labelText: lang == 'ar'
+                              ? 'هل تستخدم التقسيط؟'
+                              : 'Do you use BNPL?',
+                        ),
+                        items: ['never', 'sometimes', 'often']
+                            .map(
+                              (v) => DropdownMenuItem(value: v, child: Text(v)),
+                            )
+                            .toList(),
+                        onChanged: (v) =>
+                            bloc.add(UpdateQuestionnaire(bnpl: v)),
+                      ),
+                      // ... other fields
+                    ]
+                    .animate(interval: 100.ms)
+                    .fade(duration: 400.ms)
+                    .slideY(begin: 0.1, curve: Curves.easeOut),
           ),
         ),
       );
@@ -823,192 +913,193 @@ class OnboardingFlowView extends StatelessWidget {
         key: key,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                t(lang, 'firstExpense'),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: lang == 'ar' ? 'المبلغ' : 'Amount',
-                      ),
-                      controller: TextEditingController(
-                        text: state.firstTxnAmount.toString(),
-                      ),
-                      onChanged: (v) => bloc.add(
-                        UpdateFirstFn(
-                          double.tryParse(v) ?? state.firstTxnAmount,
-                          state.firstTxnDesc,
-                          state.firstTxnCategory,
-                          state.firstTxnDate,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildBubbleHeader(
+                  lang == 'ar'
+                      ? 'لنسجل أول عملية مصروف لتبدأ رحلتك.'
+                      : 'Let\'s record your first expense to get started.',
+                  lang,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: lang == 'ar' ? 'المبلغ' : 'Amount',
+                        ),
+                        controller: TextEditingController(
+                          text: state.firstTxnAmount.toString(),
+                        ),
+                        onChanged: (v) => bloc.add(
+                          UpdateFirstFn(
+                            double.tryParse(v) ?? state.firstTxnAmount,
+                            state.firstTxnDesc,
+                            state.firstTxnCategory,
+                            state.firstTxnDate,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        labelText: lang == 'ar' ? 'التاريخ' : 'Date',
-                        suffixIcon: const Icon(Icons.calendar_month_outlined),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: lang == 'ar' ? 'التاريخ' : 'Date',
+                          suffixIcon: const Icon(Icons.calendar_month_outlined),
+                        ),
+                        controller: TextEditingController(text: dateStr),
+                        onTap: () async {
+                          final now = DateTime.now();
+                          final picked = await showDatePicker(
+                            context: context,
+                            firstDate: DateTime(now.year - 2),
+                            lastDate: DateTime(now.year + 1),
+                            initialDate: state.firstTxnDate,
+                          );
+                          if (picked != null) {
+                            bloc.add(
+                              UpdateFirstFn(
+                                state.firstTxnAmount,
+                                state.firstTxnDesc,
+                                state.firstTxnCategory,
+                                picked,
+                              ),
+                            );
+                          }
+                        },
                       ),
-                      controller: TextEditingController(text: dateStr),
-                      onTap: () async {
-                        final now = DateTime.now();
-                        final picked = await showDatePicker(
-                          context: context,
-                          firstDate: DateTime(now.year - 2),
-                          lastDate: DateTime(now.year + 1),
-                          initialDate: state.firstTxnDate,
-                        );
-                        if (picked != null) {
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: lang == 'ar' ? 'الوصف' : 'Description',
+                  ),
+                  controller: TextEditingController(text: state.firstTxnDesc),
+                  onChanged: (v) => bloc.add(
+                    UpdateFirstFn(
+                      state.firstTxnAmount,
+                      v,
+                      state.firstTxnCategory,
+                      state.firstTxnDate,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: state.firstTxnCategory == 'bnpl'
+                      ? 'restaurants' // Fallback for UI if BNPL is selected (conceptually tricky without separate state, but user asked for content)
+                      // Actually if it's 'bnpl', we should probably show the actual underlying category if we tracked it, but we don't.
+                      // So we default to 'restaurants' or just keep it sync if it's in list.
+                      // 'bnpl' is NOT in categories list usually.
+                      : state.firstTxnCategory,
+                  decoration: InputDecoration(
+                    labelText: lang == 'ar' ? 'التصنيف' : 'Category',
+                  ),
+                  items: categories
+                      .map(
+                        (c) => DropdownMenuItem(
+                          value: c.key,
+                          child: Text(lang == 'ar' ? c.ar : c.en),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) {
+                      bloc.add(
+                        UpdateFirstFn(
+                          state.firstTxnAmount,
+                          state.firstTxnDesc,
+                          v,
+                          state.firstTxnDate,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          lang == 'ar' ? 'عملية تقسيط' : 'BNPL / Installment',
+                        ),
+                      ),
+                      Switch(
+                        value: state.firstTxnCategory == 'bnpl',
+                        onChanged: (v) {
                           bloc.add(
                             UpdateFirstFn(
                               state.firstTxnAmount,
                               state.firstTxnDesc,
-                              state.firstTxnCategory,
-                              picked,
+                              v
+                                  ? 'bnpl'
+                                  : 'restaurants', // Default back to restaurants if unchecked
+                              state.firstTxnDate,
                             ),
                           );
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: lang == 'ar' ? 'الوصف' : 'Description',
-                ),
-                controller: TextEditingController(text: state.firstTxnDesc),
-                onChanged: (v) => bloc.add(
-                  UpdateFirstFn(
-                    state.firstTxnAmount,
-                    v,
-                    state.firstTxnCategory,
-                    state.firstTxnDate,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: state.firstTxnCategory == 'bnpl'
-                    ? 'restaurants' // Fallback for UI if BNPL is selected (conceptually tricky without separate state, but user asked for content)
-                    // Actually if it's 'bnpl', we should probably show the actual underlying category if we tracked it, but we don't.
-                    // So we default to 'restaurants' or just keep it sync if it's in list.
-                    // 'bnpl' is NOT in categories list usually.
-                    : state.firstTxnCategory,
-                decoration: InputDecoration(
-                  labelText: lang == 'ar' ? 'التصنيف' : 'Category',
-                ),
-                items: categories
-                    .map(
-                      (c) => DropdownMenuItem(
-                        value: c.key,
-                        child: Text(lang == 'ar' ? c.ar : c.en),
+                        },
                       ),
-                    )
-                    .toList(),
-                onChanged: (v) {
-                  if (v != null) {
-                    bloc.add(
-                      UpdateFirstFn(
-                        state.firstTxnAmount,
-                        state.firstTxnDesc,
-                        v,
-                        state.firstTxnDate,
-                      ),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outlineVariant,
+                    ],
                   ),
                 ),
-                child: Row(
+                const SizedBox(height: 12),
+                Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        lang == 'ar' ? 'عملية تقسيط' : 'BNPL / Installment',
+                      child: FilledButton.tonal(
+                        onPressed: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.mic_none_outlined, size: 18),
+                            const SizedBox(width: 8),
+                            Text(t(lang, 'voice')),
+                          ],
+                        ),
                       ),
                     ),
-                    Switch(
-                      value: state.firstTxnCategory == 'bnpl',
-                      onChanged: (v) {
-                        bloc.add(
-                          UpdateFirstFn(
-                            state.firstTxnAmount,
-                            state.firstTxnDesc,
-                            v
-                                ? 'bnpl'
-                                : 'restaurants', // Default back to restaurants if unchecked
-                            state.firstTxnDate,
-                          ),
-                        );
-                      },
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: FilledButton.tonal(
+                        onPressed: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.photo_camera_outlined, size: 18),
+                            const SizedBox(width: 8),
+                            Text(t(lang, 'camera')),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.tonal(
-                      onPressed: () {},
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.mic_none_outlined, size: 18),
-                          const SizedBox(width: 8),
-                          Text(t(lang, 'voice')),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: FilledButton.tonal(
-                      onPressed: () {},
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.photo_camera_outlined, size: 18),
-                          const SizedBox(width: 8),
-                          Text(t(lang, 'camera')),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              InsightBanner(
-                lang: lang,
-                severity: 'info',
-                title: lang == 'ar' ? 'الذكاء الاصطناعي' : 'AI',
-                message: lang == 'ar'
-                    ? 'سيتم التصنيف تلقائياً ويمكنك التعديل.'
-                    : 'We’ll auto-categorize and you can override.',
-              ),
-            ],
+                const SizedBox(height: 12),
+                InsightBanner(
+                  lang: lang,
+                  severity: 'info',
+                  title: lang == 'ar' ? 'الذكاء الاصطناعي' : 'AI',
+                  message: lang == 'ar'
+                      ? 'سيتم التصنيف تلقائياً ويمكنك التعديل.'
+                      : 'We’ll auto-categorize and you can override.',
+                ),
+              ].animate(interval: 100.ms).fade(duration: 400.ms).slideY(begin: 0.1, curve: Curves.easeOut),
+            ),
           ),
         ),
       );
@@ -1019,63 +1110,78 @@ class OnboardingFlowView extends StatelessWidget {
       key: key,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              lang == 'ar' ? 'إنشاء حساب' : 'Create Account',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              lang == 'ar'
-                  ? 'لتزامن بياناتك ومتابعة تقدمك.'
-                  : 'Sync your data and keep your progress.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: lang == 'ar' ? 'الاسم' : 'Name',
-              ),
-              onChanged: (v) => bloc.add(UpdateAuthData(name: v)),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: lang == 'ar' ? 'البريد الإلكتروني' : 'Email',
-              ),
-              keyboardType: TextInputType.emailAddress,
-              onChanged: (v) => bloc.add(UpdateAuthData(email: v)),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: lang == 'ar' ? 'كلمة المرور' : 'Password',
-              ),
-              obscureText: true,
-              onChanged: (v) => bloc.add(UpdateAuthData(password: v)),
-            ),
-            const SizedBox(height: 24),
-            if (state.status == OnboardingStatus.submitting)
-              const Center(child: CircularProgressIndicator())
-            else
-              FilledButton(
-                onPressed: () => bloc.add(SignUp()),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(lang == 'ar' ? 'إنشاء حساب' : 'Create Account'),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward, size: 18),
-                  ],
-                ),
-              ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children:
+                [
+                      _buildBubbleHeader(
+                        lang == 'ar'
+                            ? 'أنت جاهز تماماً! أنشئ حساباً لحفظ تقدمك.'
+                            : 'You\'re all set! Create an account to save your progress.',
+                        lang,
+                      ),
+                      Text(
+                        lang == 'ar' ? 'إنشاء حساب' : 'Create Account',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w800),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        lang == 'ar'
+                            ? 'لتزامن بياناتك ومتابعة تقدمك.'
+                            : 'Sync your data and keep your progress.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: lang == 'ar' ? 'الاسم' : 'Name',
+                        ),
+                        onChanged: (v) => bloc.add(UpdateAuthData(name: v)),
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: lang == 'ar'
+                              ? 'البريد الإلكتروني'
+                              : 'Email',
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        onChanged: (v) => bloc.add(UpdateAuthData(email: v)),
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: lang == 'ar' ? 'كلمة المرور' : 'Password',
+                        ),
+                        obscureText: true,
+                        onChanged: (v) => bloc.add(UpdateAuthData(password: v)),
+                      ),
+                      const SizedBox(height: 24),
+                      if (state.status == OnboardingStatus.submitting)
+                        const Center(child: CircularProgressIndicator())
+                      else
+                        FilledButton(
+                          onPressed: () => bloc.add(SignUp()),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                lang == 'ar' ? 'إنشاء حساب' : 'Create Account',
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward, size: 18),
+                            ],
+                          ),
+                        ),
+                    ]
+                    .animate(interval: 100.ms)
+                    .fade(duration: 400.ms)
+                    .slideY(begin: 0.1, curve: Curves.easeOut),
+          ),
         ),
       ),
     );
