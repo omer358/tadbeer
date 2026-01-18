@@ -17,8 +17,8 @@ abstract class RemoteDataSource {
   Future<UserProfile> getUserProfile();
   Future<void> saveUserProfile(UserProfile profile);
 
-  Future<List<TransactionEntity>> getTransactions();
-  Future<void> addTransaction(TransactionEntity transaction);
+  Future<List<TransactionEntity>> getTransactions(String userId);
+  Future<void> addTransaction(String userId, TransactionEntity transaction);
 
   Future<Goal?> getGoal();
   Future<void> saveGoal(Goal goal);
@@ -73,14 +73,26 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<List<TransactionEntity>> getTransactions() async {
-    final response = await _dio.get('/transactions');
+  Future<List<TransactionEntity>> getTransactions(String userId) async {
+    final response = await _dio.get(
+      '/expenses',
+      options: Options(headers: {'X-User-Id': userId}),
+    );
     return (response.data as List).map((e) => _txnFromJson(e)).toList();
   }
 
   @override
-  Future<void> addTransaction(TransactionEntity transaction) async {
-    await _dio.post('/transactions', data: _txnToJson(transaction));
+  Future<void> addTransaction(
+    String userId,
+    TransactionEntity transaction,
+  ) async {
+    // Backend expects 'type' (EXPENSE/INCOME), 'date' (YYYY-MM-DD), etc.
+    // _txnToJson needs to be robust.
+    await _dio.post(
+      '/expenses',
+      options: Options(headers: {'X-User-Id': userId}),
+      data: _txnToJson(transaction),
+    );
   }
 
   @override
@@ -205,7 +217,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     'amount': t.amount,
     'description': t.description,
     'category': t.category,
-    'date': t.date.toIso8601String(),
+    'date': t.date.toIso8601String().substring(0, 10),
+    'type': t.direction == 'debit' ? 'EXPENSE' : 'INCOME',
     'isBnpl': t.isBnpl,
   };
 

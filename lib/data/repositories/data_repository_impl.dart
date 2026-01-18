@@ -18,15 +18,39 @@ class DataRepositoryImpl implements DataRepository {
   DataRepositoryImpl(this._localDataSource, this._remoteDataSource);
 
   @override
-  Future<void> addTransaction(TransactionEntity transaction) =>
-      _localDataSource.addTransaction(transaction);
+  Future<void> addTransaction(TransactionEntity transaction) async {
+    final userId = await _localDataSource.getUserId();
+    if (userId != null) {
+      try {
+        await _remoteDataSource.addTransaction(userId, transaction);
+      } catch (e) {
+        log('Error adding transaction remotely: $e', name: 'DataRepository');
+        // Continue to add locally so user sees it?
+        // Or throw? If "impl get and post", usually implies remote sync.
+        // I'll throw to inform user.
+        throw ServerException(e.toString());
+      }
+    }
+    await _localDataSource.addTransaction(transaction);
+  }
 
   @override
   Future<Goal?> getGoal() => _localDataSource.getGoal();
 
   @override
-  Future<List<TransactionEntity>> getTransactions() =>
-      _localDataSource.getTransactions();
+  Future<List<TransactionEntity>> getTransactions() async {
+    final userId = await _localDataSource.getUserId();
+    if (userId != null) {
+      try {
+        return await _remoteDataSource.getTransactions(userId);
+      } catch (e) {
+        log('Error getting transactions remotely: $e', name: 'DataRepository');
+        // Fallback?
+        return _localDataSource.getTransactions();
+      }
+    }
+    return _localDataSource.getTransactions();
+  }
 
   @override
   Future<UserProfile> getUserProfile() => _localDataSource.getUserProfile();
