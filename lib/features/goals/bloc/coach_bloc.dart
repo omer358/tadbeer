@@ -110,7 +110,8 @@ class CoachBloc extends Bloc<CoachEvent, CoachState> {
         } else if (e is ServerException) {
           errorMessage = t(event.lang, 'error.server');
         } else {
-          errorMessage = '${t(event.lang, 'error.unknown')} ($e)';
+          // Use generic unknown error without raw exception details
+          errorMessage = t(event.lang, 'error.unknown');
         }
 
         // Add error message as bot response

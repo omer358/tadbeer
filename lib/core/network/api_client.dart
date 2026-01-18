@@ -13,8 +13,8 @@ class ApiClient {
               baseUrl ??
               dotenv.env['API_BASE_URL'] ??
               'http://192.168.100.112:8080/api',
-          connectTimeout: const Duration(seconds: 20),
-          receiveTimeout: const Duration(seconds: 20),
+          connectTimeout: const Duration(seconds: 40),
+          receiveTimeout: const Duration(seconds: 40),
           headers: {'Content-Type': 'application/json'},
         ),
       ) {
