@@ -22,6 +22,14 @@ class SendQuery extends CoachEvent {
   List<Object> get props => [query, lang];
 }
 
+class SendVoice extends CoachEvent {
+  final String filePath;
+  final String lang;
+  const SendVoice(this.filePath, this.lang);
+  @override
+  List<Object> get props => [filePath, lang];
+}
+
 class ResetChat extends CoachEvent {}
 
 // State
@@ -115,6 +123,58 @@ class CoachBloc extends Bloc<CoachEvent, CoachState> {
         }
 
         // Add error message as bot response
+        final newerMessages = List<ChatMessage>.from(state.messages)
+          ..add(
+            ChatMessage(
+              text: errorMessage,
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          );
+        emit(
+          state.copyWith(messages: newerMessages, status: CoachStatus.failure),
+        );
+      }
+    });
+
+    on<SendVoice>((event, emit) async {
+      final newMessages = List<ChatMessage>.from(state.messages)
+        ..add(
+          ChatMessage(
+            text: '🎤 Voice Message',
+            isUser: true,
+            timestamp: DateTime.now(),
+          ),
+        );
+
+      emit(state.copyWith(messages: newMessages, status: CoachStatus.loading));
+
+      try {
+        final response = await _repo.chatWithVoice(event.filePath);
+        final newerMessages = List<ChatMessage>.from(state.messages)
+          ..add(
+            ChatMessage(
+              text: response,
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          );
+        emit(
+          state.copyWith(messages: newerMessages, status: CoachStatus.success),
+        );
+      } catch (e) {
+        log('CoachBloc Voice Error: $e', name: 'CoachBloc', error: e);
+        String errorMessage;
+        if (e is ConnectionTimeoutException) {
+          errorMessage = t(event.lang, 'error.timeout');
+        } else if (e is NetworkException) {
+          errorMessage = t(event.lang, 'error.noInternet');
+        } else if (e is ServerException) {
+          errorMessage = t(event.lang, 'error.server');
+        } else {
+          errorMessage = t(event.lang, 'error.unknown');
+        }
+
         final newerMessages = List<ChatMessage>.from(state.messages)
           ..add(
             ChatMessage(

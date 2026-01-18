@@ -221,6 +221,20 @@ class DataRepositoryImpl implements DataRepository {
   }
 
   @override
+  Future<String> chatWithVoice(String filePath) async {
+    final userId = await _localDataSource.getUserId();
+    if (userId == null) {
+      throw ServerException('User ID not found');
+    }
+    try {
+      return await _remoteDataSource.chatWithVoice(userId, filePath);
+    } catch (e) {
+      log('Error using voice chat: $e', name: 'DataRepository', error: e);
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
   Future<bool> hasSession() async {
     final uid = await _localDataSource.getUserId();
     return uid != null;

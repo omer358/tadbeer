@@ -7,6 +7,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/dashboard/bloc/dashboard_bloc.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
 import 'bloc/coach_bloc.dart';
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -31,11 +35,64 @@ class _CoachView extends StatefulWidget {
 
 class _CoachViewState extends State<_CoachView> {
   final TextEditingController _controller = TextEditingController();
+  late final AudioRecorder _audioRecorder;
+  bool _isRecording = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _audioRecorder = AudioRecorder();
+  }
 
   @override
   void dispose() {
+    _audioRecorder.dispose();
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _toggleRecording() async {
+    if (_isRecording) {
+      await _stopRecording();
+    } else {
+      await _startRecording();
+    }
+  }
+
+  Future<void> _startRecording() async {
+    try {
+      if (await _audioRecorder.hasPermission()) {
+        final dir = await getTemporaryDirectory();
+        final path =
+            '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.wav';
+
+        await _audioRecorder.start(
+          const RecordConfig(encoder: AudioEncoder.wav),
+          path: path,
+        );
+
+        setState(() {
+          _isRecording = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Recording Error: $e');
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    try {
+      final path = await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+      });
+      if (path != null) {
+        final lang = context.read<SettingsBloc>().state.locale.languageCode;
+        context.read<CoachBloc>().add(SendVoice(path, lang));
+      }
+    } catch (e) {
+      debugPrint('Stop Recording Error: $e');
+    }
   }
 
   void _send() {
@@ -322,6 +379,21 @@ class _CoachViewState extends State<_CoachView> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                   ),
                   onSubmitted: (_) => _send(),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton.filled(
+                style: IconButton.styleFrom(
+                  backgroundColor: _isRecording
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.secondaryContainer,
+                  foregroundColor: _isRecording
+                      ? Theme.of(context).colorScheme.onError
+                      : Theme.of(context).colorScheme.onSecondaryContainer,
+                ),
+                onPressed: _toggleRecording,
+                icon: Icon(
+                  _isRecording ? Icons.stop_rounded : Icons.mic_rounded,
                 ),
               ),
               const SizedBox(width: 8),

@@ -30,6 +30,8 @@ abstract class RemoteDataSource {
   Future<DashboardData> getDashboard(String userId);
 
   Future<String> uploadStatement(String userId, String filePath);
+
+  Future<String> chatWithVoice(String userId, String filePath);
 }
 
 class RemoteDataSourceImpl implements RemoteDataSource {
@@ -172,6 +174,20 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     final response = await _dio.post(
       '/expenses/upload-statement',
       queryParameters: {'userId': userId},
+      data: formData,
+    );
+    return response.data.toString();
+  }
+
+  @override
+  Future<String> chatWithVoice(String userId, String filePath) async {
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+    });
+
+    final response = await _dio.post(
+      '/chat/voice',
+      options: Options(headers: {'X-User-Id': userId}),
       data: formData,
     );
     return response.data.toString();
