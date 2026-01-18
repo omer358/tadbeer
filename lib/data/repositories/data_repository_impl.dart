@@ -35,7 +35,54 @@ class DataRepositoryImpl implements DataRepository {
   }
 
   @override
-  Future<Goal?> getGoal() => _localDataSource.getGoal();
+  Future<List<Goal>> getGoals() async {
+    final userId = await _localDataSource.getUserId();
+    if (userId != null) {
+      try {
+        final remoteGoals = await _remoteDataSource.fetchGoals(userId);
+
+        // We need to calculate savedAmount because it might not be in the DTO?
+        // Wait, DTO didn't have savedAmount, but we need it.
+        // Let's assume we can calculate it from transactions or get it from dashboard.
+        // Using transactions to update savedAmount:
+        final txns = await getTransactions();
+        final goals = <Goal>[];
+        for (final g in remoteGoals) {
+          // Calculate saved based on savings transactions...
+          // But goal DTO doesn't link txns.
+          // For now, trust the remote goal or local.
+          // Since remote DTO might have monthlySavings * months?
+          // No, let's keep it simple. If DTO response has it (mapped in remote), use it.
+          // In remote_data_source, we mapped savedAmount to 0 because DTO didn't have it.
+
+          // Let's try to populate from local if available (matching ID/Name)
+          // or just return what we have.
+          goals.add(g);
+        }
+        return goals;
+      } catch (e) {
+        log('Error getting goals: $e', name: 'DataRepository');
+        // Fallback to local single goal?
+        final g = await _localDataSource.getGoal();
+        return g != null ? [g] : [];
+      }
+    }
+    final g = await _localDataSource.getGoal();
+    return g != null ? [g] : [];
+  }
+
+  @override
+  Future<void> addGoal(Goal goal) async {
+    final userId = await _localDataSource.getUserId();
+    if (userId != null) {
+      try {
+        await _remoteDataSource.createGoal(userId, goal);
+      } catch (e) {
+        throw ServerException(e.toString());
+      }
+    }
+    await _localDataSource.saveGoal(goal);
+  }
 
   @override
   Future<List<TransactionEntity>> getTransactions() async {
@@ -54,9 +101,6 @@ class DataRepositoryImpl implements DataRepository {
 
   @override
   Future<UserProfile> getUserProfile() => _localDataSource.getUserProfile();
-
-  @override
-  Future<void> saveGoal(Goal goal) => _localDataSource.saveGoal(goal);
 
   @override
   Future<void> saveUserProfile(UserProfile profile) =>

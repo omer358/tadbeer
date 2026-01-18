@@ -74,7 +74,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
         final p = await _repo.getUserProfile();
         final txns = await _repo.getTransactions();
-        final g = await _repo.getGoal();
+        final goals = await _repo.getGoals();
+        final g = goals.isNotEmpty ? goals.first : null;
         final b = await _repo.getBudgets();
 
         final dashboardSug = data.suggestions.dashboard

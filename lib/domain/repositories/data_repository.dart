@@ -11,8 +11,8 @@ abstract class DataRepository {
   Future<List<TransactionEntity>> getTransactions();
   Future<void> addTransaction(TransactionEntity transaction);
 
-  Future<Goal?> getGoal();
-  Future<void> saveGoal(Goal goal);
+  Future<List<Goal>> getGoals();
+  Future<void> addGoal(Goal goal);
 
   // For budget/categories (simplified as map in profile or separate?)
   // The original code passed 'budgets' map.

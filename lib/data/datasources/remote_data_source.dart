@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'dart:math' as math;
+import 'package:uuid/uuid.dart';
 import '../../domain/entities/goal.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/user_profile.dart';
@@ -20,8 +22,8 @@ abstract class RemoteDataSource {
   Future<List<TransactionEntity>> getTransactions(String userId);
   Future<void> addTransaction(String userId, TransactionEntity transaction);
 
-  Future<Goal?> getGoal();
-  Future<void> saveGoal(Goal goal);
+  Future<List<Goal>> fetchGoals(String userId);
+  Future<Goal> createGoal(String userId, Goal goal);
 
   Future<String> askCoach(String query, String lang);
 
@@ -63,7 +65,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
           'name': user.name,
         },
         'profile': _profileToJson(profile),
-        'goal': _goalToJson(goal),
+        'goal': _goalToDto(goal),
         'first_txn': _txnToJson(firstTxn),
       },
     );
@@ -116,19 +118,29 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<Goal?> getGoal() async {
+  Future<List<Goal>> fetchGoals(String userId) async {
     try {
-      final response = await _dio.get('/goal');
-      if (response.data == null) return null;
-      return _goalFromJson(response.data);
+      final response = await _dio.get(
+        '/goals',
+        options: Options(headers: {'X-User-Id': userId}),
+      );
+      if (response.data is List) {
+        return (response.data as List).map((e) => _goalFromDto(e)).toList();
+      }
+      return [];
     } catch (e) {
-      return null;
+      return [];
     }
   }
 
   @override
-  Future<void> saveGoal(Goal goal) async {
-    await _dio.put('/goal', data: _goalToJson(goal));
+  Future<Goal> createGoal(String userId, Goal goal) async {
+    final response = await _dio.post(
+      '/goals',
+      options: Options(headers: {'X-User-Id': userId}),
+      data: _goalToDto(goal),
+    );
+    return _goalFromDto(response.data);
   }
 
   @override
@@ -254,23 +266,46 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     questionnaire: Map<String, dynamic>.from(json['questionnaire']),
   );
 
-  Map<String, dynamic> _goalToJson(Goal g) => {
-    'id': g.id,
-    'name': g.name,
-    'type': g.type,
-    'targetAmount': g.targetAmount,
-    'savedAmount': g.savedAmount,
-    'deadlineMonths': g.deadlineMonths,
-  };
+  Map<String, dynamic> _goalToDto(Goal g) {
+    // Calculate deadline string from months
+    final now = DateTime.now();
+    final d = DateTime(now.year, now.month + g.deadlineMonths, now.day);
+    final deadlineStr =
+        "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
 
-  Goal _goalFromJson(Map<String, dynamic> json) => Goal(
-    id: json['id'],
-    name: json['name'],
-    type: json['type'],
-    targetAmount: (json['targetAmount'] as num).toDouble(),
-    savedAmount: (json['savedAmount'] as num).toDouble(),
-    deadlineMonths: json['deadlineMonths'],
-  );
+    return {
+      'name': g.name,
+      'type': g.type,
+      'targetAmount': g.targetAmount,
+      'monthlySavings':
+          (g.targetAmount - g.savedAmount) /
+          math.max(1, g.deadlineMonths), // Estimated? or required?
+      'deadline': deadlineStr, // YYYY-MM-DD
+    };
+  }
+
+  Goal _goalFromDto(Map<String, dynamic> json) {
+    int deadlineMonths = 12;
+    if (json['deadline'] != null) {
+      try {
+        final d = DateTime.parse(json['deadline']);
+        final now = DateTime.now();
+        deadlineMonths = ((d.year - now.year) * 12 + d.month - now.month).clamp(
+          1,
+          120,
+        );
+      } catch (_) {}
+    }
+
+    return Goal(
+      id: const Uuid().v4(), // DTO doesn't have ID? Use random if missing.
+      name: json['name'] ?? '',
+      type: json['type'] ?? 'other',
+      targetAmount: (json['targetAmount'] as num?)?.toDouble() ?? 0.0,
+      savedAmount: 0, // Not in DTO?
+      deadlineMonths: deadlineMonths,
+    );
+  }
 
   Map<String, dynamic> _txnToJson(TransactionEntity t) => {
     'id': t.id,

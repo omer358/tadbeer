@@ -18,14 +18,20 @@ class AddGoal extends GoalsEvent {
 }
 
 class GoalsState extends Equatable {
-  final Goal? goal;
-  final UserProfile? profile; // to safe/free calculation
+  final Goal? goal; // Deprecated, use goals.firstOrNull
+  final List<Goal> goals;
+  final UserProfile? profile;
   final bool loading;
 
-  const GoalsState({this.goal, this.profile, this.loading = false});
+  const GoalsState({
+    this.goal,
+    this.goals = const [],
+    this.profile,
+    this.loading = false,
+  });
 
   @override
-  List<Object?> get props => [goal, profile, loading];
+  List<Object?> get props => [goal, goals, profile, loading];
 }
 
 class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
@@ -34,13 +40,20 @@ class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
   GoalsBloc(this._repo) : super(const GoalsState()) {
     on<LoadGoals>((event, emit) async {
       emit(const GoalsState(loading: true));
-      final g = await _repo.getGoal();
+      final goals = await _repo.getGoals();
       final p = await _repo.getUserProfile();
-      emit(GoalsState(goal: g, profile: p, loading: false));
+      emit(
+        GoalsState(
+          goal: goals.isNotEmpty ? goals.first : null,
+          goals: goals,
+          profile: p,
+          loading: false,
+        ),
+      );
     });
 
     on<AddGoal>((event, emit) async {
-      await _repo.saveGoal(event.goal);
+      await _repo.addGoal(event.goal);
       add(LoadGoals());
     });
   }
