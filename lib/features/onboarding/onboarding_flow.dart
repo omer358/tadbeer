@@ -44,9 +44,16 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         if (state.status == OnboardingStatus.success) {
-          // Navigate to AppShell
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const AppShell()),
+          );
+        } else if (state.status == OnboardingStatus.failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(t(lang, state.errorMessage ?? 'error.unknown')),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+            ),
           );
         }
       },

@@ -1,7 +1,14 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tadbeer/domain/entities/user_profile.dart';
 import 'package:uuid/uuid.dart';
-import '../../../../domain/entities/user_profile.dart';
+
+import '../../../../core/exceptions.dart';
+
+// ... (existing imports, but this goes at top of file, I will use multi_replace or ensure top is handled)
+
+// Actually replace_file_content replaces a block. I need to add import at top and change catch block at bottom.
+// I will use multi_replace_file_content.
 import '../../../../domain/repositories/data_repository.dart';
 import '../../../../data/models/onboarding_models.dart';
 
@@ -119,6 +126,7 @@ class OnboardingState extends Equatable {
   final String email;
   final String password;
   final String name;
+  final String? errorMessage;
 
   const OnboardingState({
     this.step = 0,
@@ -154,6 +162,7 @@ class OnboardingState extends Equatable {
     this.email = '',
     this.password = '',
     this.name = '',
+    this.errorMessage,
   });
 
   OnboardingState copyWith({
@@ -180,6 +189,7 @@ class OnboardingState extends Equatable {
     String? email,
     String? password,
     String? name,
+    String? errorMessage,
   }) {
     return OnboardingState(
       step: step ?? this.step,
@@ -205,6 +215,7 @@ class OnboardingState extends Equatable {
       email: email ?? this.email,
       password: password ?? this.password,
       name: name ?? this.name,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
@@ -233,6 +244,7 @@ class OnboardingState extends Equatable {
     email,
     password,
     name,
+    errorMessage,
   ];
 }
 
@@ -361,7 +373,10 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     });
 
     on<SignUp>((event, emit) async {
-      emit(state.copyWith(status: OnboardingStatus.submitting));
+      // Reset error message and set status to submitting
+      emit(
+        state.copyWith(status: OnboardingStatus.submitting, errorMessage: null),
+      );
 
       try {
         final userReq = UserReq(
@@ -421,12 +436,36 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
 
         await _repo.submitOnboarding(request);
 
-        // You might want to store response.userId or tokens here if authentication is involved
-        // For now, just success.
-
         emit(state.copyWith(status: OnboardingStatus.success));
+      } on ConnectionTimeoutException {
+        emit(
+          state.copyWith(
+            status: OnboardingStatus.failure,
+            errorMessage: 'error.timeout',
+          ),
+        );
+      } on NetworkException {
+        emit(
+          state.copyWith(
+            status: OnboardingStatus.failure,
+            errorMessage: 'error.noInternet',
+          ),
+        );
+      } on ServerException catch (e) {
+        emit(
+          state.copyWith(
+            status: OnboardingStatus.failure,
+            errorMessage:
+                'error.server', // Or use e.message if key not desired, but user asked for localization
+          ),
+        );
       } catch (e) {
-        emit(state.copyWith(status: OnboardingStatus.failure));
+        emit(
+          state.copyWith(
+            status: OnboardingStatus.failure,
+            errorMessage: 'error.unknown',
+          ),
+        );
       }
     });
   }
