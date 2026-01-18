@@ -23,8 +23,15 @@ class OnboardingFlow extends StatelessWidget {
   }
 }
 
-class OnboardingFlowView extends StatelessWidget {
+class OnboardingFlowView extends StatefulWidget {
   const OnboardingFlowView({super.key});
+
+  @override
+  State<OnboardingFlowView> createState() => _OnboardingFlowViewState();
+}
+
+class _OnboardingFlowViewState extends State<OnboardingFlowView> {
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +155,10 @@ class OnboardingFlowView extends StatelessWidget {
                               ],
                             );
                           },
-                          child: _buildStep(context, state, lang),
+                          child: Form(
+                            key: _formKey,
+                            child: _buildStep(context, state, lang),
+                          ),
                         ),
                       ),
 
@@ -175,9 +185,13 @@ class OnboardingFlowView extends StatelessWidget {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: FilledButton(
-                                  onPressed: () => context
-                                      .read<OnboardingBloc>()
-                                      .add(NextStep()),
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      context.read<OnboardingBloc>().add(
+                                        NextStep(),
+                                      );
+                                    }
+                                  },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -341,6 +355,12 @@ class OnboardingFlowView extends StatelessWidget {
                                 state.payday,
                               ),
                             ),
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return 'required';
+                              if (double.tryParse(v) == null)
+                                return 'invalid number';
+                              return null;
+                            },
                           ),
                         ),
 
@@ -539,6 +559,9 @@ class OnboardingFlowView extends StatelessWidget {
                                     ),
                                     onChanged: (v) =>
                                         bloc.add(UpdateFixedExpenseName(i, v)),
+                                    validator: (v) => v == null || v.isEmpty
+                                        ? 'required'
+                                        : null,
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -558,6 +581,10 @@ class OnboardingFlowView extends StatelessWidget {
                                         double.tryParse(v) ?? 0,
                                       ),
                                     ),
+                                    validator: (v) =>
+                                        double.tryParse(v ?? '') == null
+                                        ? 'invalid'
+                                        : null,
                                   ),
                                 ),
                                 const SizedBox(width: 6),
@@ -771,6 +798,7 @@ class OnboardingFlowView extends StatelessWidget {
                       state.goalDeadline,
                     ),
                   ),
+                  validator: (v) => v == null || v.isEmpty ? 'required' : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -787,6 +815,9 @@ class OnboardingFlowView extends StatelessWidget {
                       state.goalDeadline,
                     ),
                   ),
+                  validator: (v) => double.tryParse(v ?? '') == null
+                      ? 'invalid number'
+                      : null,
                 ),
                 const SizedBox(height: 12),
                 FilledButton.tonal(
@@ -1141,6 +1172,8 @@ class OnboardingFlowView extends StatelessWidget {
                           labelText: lang == 'ar' ? 'الاسم' : 'Name',
                         ),
                         onChanged: (v) => bloc.add(UpdateAuthData(name: v)),
+                        validator: (v) =>
+                            v == null || v.isEmpty ? 'required' : null,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
@@ -1151,6 +1184,9 @@ class OnboardingFlowView extends StatelessWidget {
                         ),
                         keyboardType: TextInputType.emailAddress,
                         onChanged: (v) => bloc.add(UpdateAuthData(email: v)),
+                        validator: (v) => v == null || !v.contains('@')
+                            ? 'invalid email'
+                            : null,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
@@ -1159,13 +1195,19 @@ class OnboardingFlowView extends StatelessWidget {
                         ),
                         obscureText: true,
                         onChanged: (v) => bloc.add(UpdateAuthData(password: v)),
+                        validator: (v) =>
+                            v == null || v.length < 6 ? 'min 6 chars' : null,
                       ),
                       const SizedBox(height: 24),
                       if (state.status == OnboardingStatus.submitting)
                         const Center(child: CircularProgressIndicator())
                       else
                         FilledButton(
-                          onPressed: () => bloc.add(SignUp()),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              bloc.add(SignUp());
+                            }
+                          },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
