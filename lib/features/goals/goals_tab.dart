@@ -8,6 +8,7 @@ import '../../widgets/insight_banner.dart';
 import '../goals/bloc/goals_bloc.dart';
 import '../settings/bloc/settings_bloc.dart';
 import '../goals/add_goal_dialog.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../domain/entities/goal.dart';
 
 class GoalsTab extends StatelessWidget {
@@ -35,17 +36,6 @@ class GoalsTab extends StatelessWidget {
         // Calculate feasible
         final income = profile?.incomeAmount ?? 0;
         final fixed = profile?.totalFixed ?? 0;
-        // Need variable spent... but GoalsBloc state doesn't have it.
-        // Option 1: Inject variable spent via constructor (from dashboard?)
-        // Option 2: Combine in BLoC.
-        // For now, let's assume 'free' income calculation is simplified or 0 if missing.
-        // Actually the original GoalsTab logic used 'totals' passed from parent.
-        // Currently `GoalsBloc` fetches ONLY goal and profile. It doesn't fetch transactions.
-        // Let's assume free income = income - fixed (ignoring variable for this isolation, or better: update GoalsBloc to get txns too?)
-        // Or simpler: GoalsTab doesn't need perfect correctness for this prototype step,
-        // OR we just use a placeholder for variable.
-        // Let's fetch data and refine later.
-
         final variable = 0.0; // TODO: Get variable from Transactions repo
         final free = math.max(0, income - fixed - variable);
 
@@ -53,149 +43,182 @@ class GoalsTab extends StatelessWidget {
         final feasible = req <= free;
 
         return ListView(
+          padding: const EdgeInsets.only(bottom: 80),
           children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        t(lang, 'goals'),
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outlineVariant.withOpacity(0.5),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SectionTitle(
+                      icon: const Icon(Icons.flag_rounded, size: 18),
+                      title: t(lang, 'goals'),
                     ),
-                    FilledButton(
-                      onPressed: () =>
-                          _openAddGoal(context, lang, income, fixed, variable),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.add, size: 18),
-                          const SizedBox(width: 6),
-                          Text(t(lang, 'addGoal')),
-                        ],
-                      ),
+                  ),
+                  FilledButton(
+                    onPressed: () =>
+                        _openAddGoal(context, lang, income, fixed, variable),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.add, size: 18),
+                        const SizedBox(width: 6),
+                        Text(t(lang, 'addGoal')),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ).animate().fade().slideY(begin: -0.1, end: 0),
+            const SizedBox(height: 12),
+            if (goal != null)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outlineVariant.withOpacity(0.5),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            if (goal != null)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        goal.name,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w900),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              lang == 'ar' ? 'التقدم' : 'Progress',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                  ),
-                            ),
-                          ),
-                          SoftBadge(
-                            feasible
-                                ? (lang == 'ar' ? 'قابل للتنفيذ' : 'Feasible')
-                                : (lang == 'ar' ? 'غير واقعي' : 'Not feasible'),
-                            bg: feasible
-                                ? Colors.green.withOpacity(0.15)
-                                : Colors.amber.withOpacity(0.18),
-                            fg: feasible
-                                ? Colors.green.shade900
-                                : Colors.amber.shade900,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      LinearProgressIndicator(
-                        value: (saved / target).clamp(0, 1).toDouble(),
-                        minHeight: 8,
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: MiniInfoCard(
-                              label: lang == 'ar' ? 'المدخر' : 'Saved',
-                              value: fmtSAR(saved),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: MiniInfoCard(
-                              label: lang == 'ar' ? 'المتبقي' : 'Remaining',
-                              value: fmtSAR(target - saved),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      InsightBanner(
-                        lang: lang,
-                        severity: feasible ? 'success' : 'warning',
-                        title: lang == 'ar' ? 'صحة الهدف' : 'Goal health',
-                        message: feasible
-                            ? (lang == 'ar'
-                                  ? 'مطلوب ادخار ${fmtSAR(req.round())} شهرياً. المتاح لديك تقريباً ${fmtSAR(free.round())}.'
-                                  : 'You need to save ${fmtSAR(req.round())}/mo. You have ~${fmtSAR(free.round())} free.')
-                            : (lang == 'ar'
-                                  ? 'المطلوب ${fmtSAR(req.round())} شهرياً أكبر من المتاح ${fmtSAR(free.round())}. اقترح تمديد المدة.'
-                                  : 'Required ${fmtSAR(req.round())}/mo exceeds free ${fmtSAR(free.round())}. Extend the deadline.'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            const SizedBox(height: 12),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SectionTitle(
-                      icon: const Icon(Icons.auto_awesome, size: 18),
-                      title: lang == 'ar' ? 'اقتراحات' : 'Suggestions',
+                    Text(
+                      goal.name,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     const SizedBox(height: 10),
-                    SuggestionCard(
-                      title: lang == 'ar'
-                          ? 'خفض المطاعم 15%'
-                          : 'Reduce dining by 15%',
-                      desc: lang == 'ar'
-                          ? 'سيوفر هذا مبلغ يساعدك تصل الهدف أسرع.'
-                          : 'This saves money that moves your goal forward faster.',
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            lang == 'ar' ? 'التقدم' : 'Progress',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ),
+                        SoftBadge(
+                          feasible
+                              ? (lang == 'ar' ? 'قابل للتنفيذ' : 'Feasible')
+                              : (lang == 'ar' ? 'غير واقعي' : 'Not feasible'),
+                          bg: feasible
+                              ? Colors.green.withOpacity(0.15)
+                              : Colors.amber.withOpacity(0.18),
+                          fg: feasible
+                              ? Colors.green.shade900
+                              : Colors.amber.shade900,
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
-                    SuggestionCard(
-                      title: lang == 'ar'
-                          ? 'تجميد التقسيط الجديد'
-                          : 'Freeze new BNPL',
-                      desc: lang == 'ar'
-                          ? 'اكتفِ بالأقساط الحالية هذا الشهر.'
-                          : 'Stick to existing installments this month.',
+                    LinearProgressIndicator(
+                      value: (saved / target).clamp(0, 1).toDouble(),
+                      minHeight: 8,
+                      borderRadius: BorderRadius.circular(99),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: MiniInfoCard(
+                            label: lang == 'ar' ? 'المدخر' : 'Saved',
+                            value: fmtSAR(saved),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: MiniInfoCard(
+                            label: lang == 'ar' ? 'المتبقي' : 'Remaining',
+                            value: fmtSAR(target - saved),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    InsightBanner(
+                      lang: lang,
+                      severity: feasible ? 'success' : 'warning',
+                      title: lang == 'ar' ? 'صحة الهدف' : 'Goal health',
+                      message: feasible
+                          ? (lang == 'ar'
+                                ? 'مطلوب ادخار ${fmtSAR(req.round())} شهرياً. المتاح لديك تقريباً ${fmtSAR(free.round())}.'
+                                : 'You need to save ${fmtSAR(req.round())}/mo. You have ~${fmtSAR(free.round())} free.')
+                          : (lang == 'ar'
+                                ? 'المطلوب ${fmtSAR(req.round())} شهرياً أكبر من المتاح ${fmtSAR(free.round())}. اقترح تمديد المدة.'
+                                : 'Required ${fmtSAR(req.round())}/mo exceeds free ${fmtSAR(free.round())}. Extend the deadline.'),
                     ),
                   ],
                 ),
+              ).animate().fade().slideX(),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outlineVariant.withOpacity(0.5),
+                ),
               ),
-            ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SectionTitle(
+                    icon: const Icon(Icons.auto_awesome, size: 18),
+                    title: lang == 'ar' ? 'اقتراحات' : 'Suggestions',
+                  ),
+                  const SizedBox(height: 10),
+                  SuggestionCard(
+                    title: lang == 'ar'
+                        ? 'خفض المطاعم 15%'
+                        : 'Reduce dining by 15%',
+                    desc: lang == 'ar'
+                        ? 'سيوفر هذا مبلغ يساعدك تصل الهدف أسرع.'
+                        : 'This saves money that moves your goal forward faster.',
+                  ).animate().fade(delay: 200.ms).slideX(),
+                  const SizedBox(height: 8),
+                  SuggestionCard(
+                    title: lang == 'ar'
+                        ? 'تجميد التقسيط الجديد'
+                        : 'Freeze new BNPL',
+                    desc: lang == 'ar'
+                        ? 'اكتفِ بالأقساط الحالية هذا الشهر.'
+                        : 'Stick to existing installments this month.',
+                  ).animate().fade(delay: 300.ms).slideX(),
+                ],
+              ),
+            ).animate().fade(delay: 100.ms).slideY(begin: 0.1, end: 0),
           ],
         );
       },

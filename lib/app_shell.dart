@@ -60,14 +60,7 @@ class _AppShellState extends State<AppShell> {
         titleSpacing: 20,
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.wallet, size: 20, color: Colors.white),
-            ),
+            Image.asset('assets/logo.png', height: 32),
             const SizedBox(width: 12),
             Text(
               t(lang, 'appName'),

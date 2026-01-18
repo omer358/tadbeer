@@ -132,7 +132,10 @@ final lightTheme = ThemeData(
       minimumSize: const Size(100, 50),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 0,
-      textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
+      textStyle: TextStyle(
+        fontFamily: GoogleFonts.inter().fontFamily,
+        fontWeight: FontWeight.w600,
+      ),
     ),
   ),
 
@@ -142,7 +145,10 @@ final lightTheme = ThemeData(
       side: const BorderSide(color: AppColors.primaryVariant),
       minimumSize: const Size(100, 50),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
+      textStyle: TextStyle(
+        fontFamily: GoogleFonts.inter().fontFamily,
+        fontWeight: FontWeight.w600,
+      ),
     ),
   ),
 
@@ -217,6 +223,33 @@ final darkTheme = ThemeData(
   appBarTheme: const AppBarTheme(
     backgroundColor: Color(0xFF0F172A),
     foregroundColor: Colors.white,
+  ),
+
+  filledButtonTheme: FilledButtonThemeData(
+    style: FilledButton.styleFrom(
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
+      minimumSize: const Size(100, 50),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 0,
+      textStyle: TextStyle(
+        fontFamily: GoogleFonts.inter().fontFamily,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ),
+
+  outlinedButtonTheme: OutlinedButtonThemeData(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: Colors.white,
+      side: const BorderSide(color: Color(0xFF475569)),
+      minimumSize: const Size(100, 50),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      textStyle: TextStyle(
+        fontFamily: GoogleFonts.inter().fontFamily,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
   ),
 
   navigationBarTheme: NavigationBarThemeData(
