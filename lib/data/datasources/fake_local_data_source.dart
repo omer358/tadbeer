@@ -3,6 +3,8 @@ import '../../domain/entities/transaction.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../domain/entities/user.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class FakeLocalDataSource {
   UserProfile _profile = UserProfile.empty;
   final List<TransactionEntity> _transactions = [];
@@ -16,6 +18,16 @@ class FakeLocalDataSource {
     'bills': 1200,
     'other': 400,
   };
+
+  Future<void> saveUserId(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', id);
+  }
+
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userId');
+  }
 
   Future<UserProfile> getUserProfile() async {
     // Simulate delay

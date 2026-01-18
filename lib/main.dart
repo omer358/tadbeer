@@ -87,10 +87,9 @@ class _AuthGateState extends State<AuthGate> {
 
   Future<void> _checkProfile() async {
     final repo = di.sl<DataRepository>();
-    final p = await repo.getUserProfile();
-    // Simple check: income > 0 means initialized for this fake app
+    final sessionExists = await repo.hasSession();
     setState(() {
-      hasProfile = p.incomeAmount > 0;
+      hasProfile = sessionExists;
     });
   }
 
