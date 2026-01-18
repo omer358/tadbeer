@@ -201,17 +201,6 @@ class OnboardingFlowView extends StatelessWidget {
     );
   }
 
-  Widget _buildDot() {
-    return Container(
-      width: 12,
-      height: 12,
-      decoration: const ShapeDecoration(
-        color: Color(0xFFD9D9D9), // Example color
-        shape: OvalBorder(),
-      ),
-    );
-  }
-
   Widget _buildStep(BuildContext context, OnboardingState state, String lang) {
     final step = state.step;
     final key = ValueKey('step_$step');
@@ -288,17 +277,7 @@ class OnboardingFlowView extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     // Avatar Stack (Simplified from snippet)
-                    SizedBox(
-                      width: 27,
-                      height: 28,
-                      child: Stack(
-                        children: [
-                          Positioned(left: 5, top: 15.50, child: _buildDot()),
-                          Positioned(left: 14.50, top: 3, child: _buildDot()),
-                          Positioned(left: 0, top: 0, child: _buildDot()),
-                        ],
-                      ),
-                    ),
+                    Image.asset('assets/bubble.png', height: 28),
                   ],
                 ),
                 const SizedBox(height: 40),
