@@ -132,6 +132,7 @@ const i18n = {
     'error.noInternet': 'No internet connection. Please check your connection.',
     'error.server': 'We encountered a technical issue. Please try again later.',
     'error.unknown': 'An unexpected error occurred.',
+    'success': 'Success',
   },
   'ar': {
     'appName': 'تدبير',
@@ -223,6 +224,7 @@ const i18n = {
         'عذراً، لا يوجد اتصال بالانترنت. يرجى التحقق من اتصالك.',
     'error.server': 'واجهنا مشكلة فنية. يرجى المحاولة في وقت لاحق.',
     'error.unknown': 'حدث خطأ غير متوقع.',
+    'success': 'تم بنجاح',
   },
 };
 

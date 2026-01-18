@@ -53,7 +53,7 @@ class _CoachViewState extends State<_CoachView> {
 
     // Reuse old logic for summary header
     final dbState = context.select((DashboardBloc b) => b.state);
-    final variable = dbState.totalSpent;
+    final variable = dbState.balance;
     final bnpl = 0.0;
     final ratio = variable <= 0 ? 0 : bnpl / variable;
     final saved = dbState.goal?.savedAmount ?? 0;
