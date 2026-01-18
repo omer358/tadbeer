@@ -78,7 +78,19 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       '/expenses',
       options: Options(headers: {'X-User-Id': userId}),
     );
-    return (response.data as List).map((e) => _txnFromJson(e)).toList();
+    final data = response.data;
+    if (data is Map) {
+      final allTxns = <TransactionEntity>[];
+      for (final list in data.values) {
+        if (list is List) {
+          allTxns.addAll(list.map((e) => _txnFromJson(e)));
+        }
+      }
+      return allTxns;
+    } else if (data is List) {
+      return data.map((e) => _txnFromJson(e)).toList();
+    }
+    return [];
   }
 
   @override
@@ -227,8 +239,34 @@ class RemoteDataSourceImpl implements RemoteDataSource {
         id: json['id'],
         amount: (json['amount'] as num).toDouble(),
         description: json['description'],
-        category: json['category'],
+        category: _mapCategory(json['category']),
         date: DateTime.parse(json['date']),
         isBnpl: json['isBnpl'] ?? false,
       );
+
+  String _mapCategory(String? backendCategory) {
+    if (backendCategory == null) return 'other';
+    // Normalize to lowercase for matching
+    final key = backendCategory.toLowerCase();
+
+    // Direct mappings for known backend keys
+    if (key == 'food') return 'restaurants';
+    if (key == 'transportation') return 'transport';
+    if (key == 'retail') return 'shopping';
+    if (key == 'telecommunications') return 'bills';
+
+    // Allowed frontend keys
+    const allowed = {
+      'restaurants',
+      'delivery',
+      'transport',
+      'shopping',
+      'bnpl',
+      'bills',
+      'other',
+    };
+
+    if (allowed.contains(key)) return key;
+    return 'other';
+  }
 }

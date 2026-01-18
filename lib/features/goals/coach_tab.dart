@@ -8,6 +8,8 @@ import '../../features/dashboard/bloc/dashboard_bloc.dart';
 import '../../features/settings/bloc/settings_bloc.dart';
 import 'bloc/coach_bloc.dart';
 
+import 'package:flutter_markdown/flutter_markdown.dart';
+
 class CoachTab extends StatelessWidget {
   const CoachTab({super.key});
 
@@ -254,14 +256,33 @@ class _CoachViewState extends State<_CoachView> {
                               : null,
                         ),
                       ),
-                      child: Text(
-                        msg.text,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: msg.isUser
-                              ? Theme.of(context).colorScheme.onPrimary
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
+                      child: msg.isUser
+                          ? Text(
+                              msg.text,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
+                                  ),
+                            )
+                          : MarkdownBody(
+                              data: msg.text,
+                              styleSheet:
+                                  MarkdownStyleSheet.fromTheme(
+                                    Theme.of(context),
+                                  ).copyWith(
+                                    p: Theme.of(context).textTheme.bodyMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                        ),
+                                    strong: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                            ),
                     ),
                   ).animate().fade().slideY(begin: 0.1, end: 0);
                 },
