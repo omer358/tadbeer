@@ -31,7 +31,7 @@ abstract class RemoteDataSource {
 
   Future<String> uploadStatement(String userId, String filePath);
 
-  Future<String> chatWithVoice(String userId, String filePath);
+  Future<String> chatWithVoice(String userId, String filePath, String lang);
 }
 
 class RemoteDataSourceImpl implements RemoteDataSource {
@@ -180,14 +180,18 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<String> chatWithVoice(String userId, String filePath) async {
+  Future<String> chatWithVoice(
+    String userId,
+    String filePath,
+    String lang,
+  ) async {
     final formData = FormData.fromMap({
       'file': await MultipartFile.fromFile(filePath),
     });
 
     final response = await _dio.post(
       '/chat/voice',
-      options: Options(headers: {'X-User-Id': userId}),
+      options: Options(headers: {'X-User-Id': userId, 'X-Lang-Pref': lang}),
       data: formData,
     );
     return response.data.toString();

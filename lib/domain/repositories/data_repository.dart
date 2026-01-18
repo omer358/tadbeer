@@ -33,5 +33,5 @@ abstract class DataRepository {
 
   Future<bool> hasSession();
   Future<String> uploadStatement(String filePath);
-  Future<String> chatWithVoice(String filePath);
+  Future<String> chatWithVoice(String filePath, String lang);
 }

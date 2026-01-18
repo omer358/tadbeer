@@ -150,7 +150,7 @@ class CoachBloc extends Bloc<CoachEvent, CoachState> {
       emit(state.copyWith(messages: newMessages, status: CoachStatus.loading));
 
       try {
-        final response = await _repo.chatWithVoice(event.filePath);
+        final response = await _repo.chatWithVoice(event.filePath, event.lang);
         final newerMessages = List<ChatMessage>.from(state.messages)
           ..add(
             ChatMessage(
