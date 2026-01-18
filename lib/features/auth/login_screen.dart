@@ -53,13 +53,16 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Container(
                 width: 400,
                 height: 400,
-                decoration: const ShapeDecoration(
+                decoration: ShapeDecoration(
                   gradient: RadialGradient(
                     center: Alignment.center,
                     radius: 0.5,
-                    colors: [Color(0xFFEAE0C7), Color(0x00EAE0C7)],
+                    colors: [
+                      Theme.of(context).colorScheme.tertiary,
+                      Theme.of(context).colorScheme.tertiary.withOpacity(0),
+                    ],
                   ),
-                  shape: OvalBorder(),
+                  shape: const OvalBorder(),
                 ),
               ),
             ),

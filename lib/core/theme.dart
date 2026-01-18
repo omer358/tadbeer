@@ -3,17 +3,18 @@ import 'package:google_fonts/google_fonts.dart';
 
 // Premium Color Palette
 class AppColors {
-  static const primary = Color(0xFF0F172A); // Slate 900
-  static const primaryVariant = Color(0xFF334155); // Slate 700
-  static const secondary = Color(0xFF10B981); // Emerald 500
-  static const accent = Color(0xFFF59E0B); // Amber 500
+  static const primary = Color(0xFF984722); // Rust
+  static const primaryVariant = Color(0xFF6D3014);
+  static const secondary = Color(0xFF9DB8B7); // Muted Teal
+  static const tertiary = Color(0xFFEAE0C7); // Beige
+  static const accent = Color(0xFFEAE0C7);
 
   static const surface = Colors.white;
-  static const background = Color(0xFFF8FAFC); // Slate 50
-  static const error = Color(0xFFEF4444); // Red 500
+  static const background = Color(0xFFFAFAF9); // Stone 50 (Warm white)
+  static const error = Color(0xFFBA1A1A);
 
-  static const textPrimary = Color(0xFF1E293B); // Slate 800
-  static const textSecondary = Color(0xFF64748B); // Slate 500
+  static const textPrimary = Color(0xFF292524); // Stone 800
+  static const textSecondary = Color(0xFF57534E); // Stone 500
 }
 
 final lightTheme = ThemeData(
@@ -24,12 +25,13 @@ final lightTheme = ThemeData(
     onPrimary: Colors.white,
     secondary: AppColors.secondary,
     onSecondary: Colors.white,
-    tertiary: AppColors.accent,
+    tertiary: AppColors.tertiary,
+    onTertiary: AppColors.textPrimary,
     surface: AppColors.surface,
     onSurface: AppColors.textPrimary,
     error: AppColors.error,
-    surfaceContainerHighest: const Color(0xFFF1F5F9), // Slate 100
-    outlineVariant: const Color(0xFFE2E8F0), // Slate 200
+    surfaceContainerHighest: const Color(0xFFF5F5F4), // Stone 100
+    outlineVariant: const Color(0xFFE7E5E4), // Stone 200
   ),
   scaffoldBackgroundColor: AppColors.background,
 
@@ -120,7 +122,7 @@ final lightTheme = ThemeData(
     elevation: 0,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(20),
-      side: const BorderSide(color: Color(0xFFF1F5F9), width: 1),
+      side: const BorderSide(color: Color(0xFFF5F5F4), width: 1),
     ),
     margin: const EdgeInsets.only(bottom: 12),
   ),
@@ -142,7 +144,7 @@ final lightTheme = ThemeData(
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
       foregroundColor: AppColors.primary,
-      side: const BorderSide(color: AppColors.primaryVariant),
+      side: const BorderSide(color: Color(0xFFE7E5E4)),
       minimumSize: const Size(100, 50),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       textStyle: TextStyle(
@@ -158,18 +160,18 @@ final lightTheme = ThemeData(
     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+      borderSide: const BorderSide(color: Color(0xFFE7E5E4)),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+      borderSide: const BorderSide(color: Color(0xFFE7E5E4)),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
       borderSide: const BorderSide(color: AppColors.primary, width: 2),
     ),
     labelStyle: GoogleFonts.inter(color: AppColors.textSecondary),
-    hintStyle: GoogleFonts.inter(color: const Color(0xFF94A3B8)),
+    hintStyle: GoogleFonts.inter(color: const Color(0xFFA8A29E)), // Stone 400
   ),
 
   navigationBarTheme: NavigationBarThemeData(
@@ -194,25 +196,38 @@ final darkTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.dark,
   colorScheme: ColorScheme.dark(
-    primary: Colors.white, // In dark mode, primary text/action is white
-    onPrimary: Colors.black,
+    primary: AppColors.tertiary, // Beige is high contrast on dark
+    onPrimary: AppColors.textPrimary,
     secondary: AppColors.secondary,
-    surface: const Color(0xFF1E293B), // Slate 800
-    onSurface: const Color(0xFFF8FAFC), // Slate 50
-    surfaceContainerHighest: const Color(0xFF334155), // Slate 700
-    outlineVariant: const Color(0xFF475569), // Slate 600
+    onSecondary: Colors.black,
+    tertiary: AppColors.primary,
+    onTertiary: Colors.white,
+    surface: const Color(0xFF292524), // Stone 800
+    onSurface: const Color(0xFFFAFAF9), // Stone 50
+    error: const Color(0xFFCF6679),
+    surfaceContainerHighest: const Color(0xFF44403C), // Stone 700
+    outlineVariant: const Color(0xFF57534E), // Stone 600
   ),
-  scaffoldBackgroundColor: const Color(0xFF0F172A), // Slate 900
+  scaffoldBackgroundColor: const Color(0xFF1C1917), // Stone 900
 
   textTheme: TextTheme(
-    displayLarge: GoogleFonts.outfit(color: Colors.white),
-    titleLarge: GoogleFonts.inter(color: Colors.white),
-    bodyLarge: GoogleFonts.inter(color: const Color(0xFFE2E8F0)),
-    bodySmall: GoogleFonts.inter(color: const Color(0xFF94A3B8)),
+    displayLarge: GoogleFonts.outfit(color: const Color(0xFFFAFAF9)),
+    displayMedium: GoogleFonts.outfit(color: const Color(0xFFFAFAF9)),
+    displaySmall: GoogleFonts.outfit(color: const Color(0xFFFAFAF9)),
+    headlineLarge: GoogleFonts.outfit(color: const Color(0xFFFAFAF9)),
+    headlineMedium: GoogleFonts.outfit(color: const Color(0xFFFAFAF9)),
+    headlineSmall: GoogleFonts.outfit(color: const Color(0xFFFAFAF9)),
+    titleLarge: GoogleFonts.inter(color: const Color(0xFFFAFAF9)),
+    titleMedium: GoogleFonts.inter(color: const Color(0xFFFAFAF9)),
+    titleSmall: GoogleFonts.inter(color: const Color(0xFFFAFAF9)),
+    bodyLarge: GoogleFonts.inter(color: const Color(0xFFE7E5E4)),
+    bodyMedium: GoogleFonts.inter(color: const Color(0xFFE7E5E4)),
+    bodySmall: GoogleFonts.inter(color: const Color(0xFFA8A29E)),
+    labelLarge: GoogleFonts.inter(color: const Color(0xFFFAFAF9)),
   ),
 
   cardTheme: CardThemeData(
-    color: const Color(0xFF1E293B),
+    color: const Color(0xFF292524),
     elevation: 0,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(20),
@@ -221,14 +236,14 @@ final darkTheme = ThemeData(
   ),
 
   appBarTheme: const AppBarTheme(
-    backgroundColor: Color(0xFF0F172A),
-    foregroundColor: Colors.white,
+    backgroundColor: Color(0xFF1C1917),
+    foregroundColor: Color(0xFFFAFAF9),
   ),
 
   filledButtonTheme: FilledButtonThemeData(
     style: FilledButton.styleFrom(
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black,
+      backgroundColor: AppColors.tertiary,
+      foregroundColor: AppColors.textPrimary,
       minimumSize: const Size(100, 50),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 0,
@@ -241,8 +256,8 @@ final darkTheme = ThemeData(
 
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
-      foregroundColor: Colors.white,
-      side: const BorderSide(color: Color(0xFF475569)),
+      foregroundColor: AppColors.tertiary,
+      side: const BorderSide(color: Color(0xFF57534E)),
       minimumSize: const Size(100, 50),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       textStyle: TextStyle(
@@ -253,13 +268,13 @@ final darkTheme = ThemeData(
   ),
 
   navigationBarTheme: NavigationBarThemeData(
-    backgroundColor: const Color(0xFF1E293B),
-    indicatorColor: Colors.white.withOpacity(0.1),
+    backgroundColor: const Color(0xFF292524),
+    indicatorColor: AppColors.tertiary.withOpacity(0.2),
     iconTheme: WidgetStateProperty.resolveWith((states) {
       if (states.contains(WidgetState.selected)) {
-        return const IconThemeData(color: Colors.white);
+        return const IconThemeData(color: AppColors.tertiary);
       }
-      return const IconThemeData(color: Color(0xFF94A3B8));
+      return const IconThemeData(color: Color(0xFFA8A29E));
     }),
   ),
 );

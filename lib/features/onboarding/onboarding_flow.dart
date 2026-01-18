@@ -228,17 +228,15 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
               child: Container(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                 decoration: ShapeDecoration(
-                  color: const Color(0xFFEDE3CB),
+                  color: Theme.of(context).colorScheme.tertiary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 child: Text(
                   text,
-                  style: const TextStyle(
-                    color: Color(0xFF1E1E1E),
-                    fontSize: 16,
-                    fontFamily: 'Quicksand',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onTertiary,
                     fontWeight: FontWeight.w500,
                     height: 1.40,
                   ),
@@ -320,18 +318,17 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                         // Monthly Income
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFD9D9D9)),
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outlineVariant,
+                            ),
                           ),
                           child: TextFormField(
                             keyboardType: TextInputType.number,
-                            style: const TextStyle(
-                              fontFamily: 'Quicksand',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF1E1E1E),
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -343,12 +340,9 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                                 padding: const EdgeInsets.all(12.0),
                                 child: Text(
                                   'SAR',
-                                  style: const TextStyle(
-                                    fontFamily: 'Quicksand',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF1E1E1E),
-                                  ),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
                                 ),
                               ),
                             ),
@@ -380,22 +374,23 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                                 children: [
                                   Text(
                                     t(lang, 'incomeSource'),
-                                    style: const TextStyle(
-                                      color: Color(0xFF1E1E1E),
-                                      fontSize: 16,
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
                                   const SizedBox(height: 8),
                                   Container(
                                     height:
                                         48, // Fixed height to match design feel
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: const Color(0xFFD9D9D9),
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.outlineVariant,
                                       ),
                                     ),
                                     padding: const EdgeInsets.symmetric(
@@ -406,12 +401,9 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                                         value: state.incomeSource,
                                         isExpanded: true,
                                         icon: const Icon(Icons.arrow_drop_down),
-                                        style: const TextStyle(
-                                          fontFamily: 'Quicksand',
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF1E1E1E),
-                                        ),
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyLarge,
                                         items: [
                                           DropdownMenuItem(
                                             value: 'salary',
@@ -462,21 +454,22 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                                 children: [
                                   Text(
                                     t(lang, 'payday'),
-                                    style: const TextStyle(
-                                      color: Color(0xFF1E1E1E),
-                                      fontSize: 16,
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
                                   const SizedBox(height: 8),
                                   Container(
                                     height: 48,
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: const Color(0xFFD9D9D9),
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.outlineVariant,
                                       ),
                                     ),
                                     padding: const EdgeInsets.symmetric(
@@ -487,12 +480,9 @@ class _OnboardingFlowViewState extends State<OnboardingFlowView> {
                                         value: state.payday.toString(),
                                         isExpanded: true,
                                         icon: const Icon(Icons.arrow_drop_down),
-                                        style: const TextStyle(
-                                          fontFamily: 'Quicksand',
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF1E1E1E),
-                                        ),
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyLarge,
                                         items:
                                             List.generate(
                                                   28,
