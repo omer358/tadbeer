@@ -45,7 +45,7 @@ class DataRepositoryImpl implements DataRepository {
         // Wait, DTO didn't have savedAmount, but we need it.
         // Let's assume we can calculate it from transactions or get it from dashboard.
         // Using transactions to update savedAmount:
-        final txns = await getTransactions();
+        // final txns = await getTransactions();
         final goals = <Goal>[];
         for (final g in remoteGoals) {
           // Calculate saved based on savings transactions...
@@ -67,8 +67,12 @@ class DataRepositoryImpl implements DataRepository {
         return g != null ? [g] : [];
       }
     }
-    final g = await _localDataSource.getGoal();
-    return g != null ? [g] : [];
+    // Return empty list if no user or user not synced?
+    // Or prefer local cache?
+    // If remote fails, we might want local cache, but check if local cache has dummy data.
+    // For now, let's trust remote + local cache sync.
+    // If we remove the "final g = await _localDataSource.getGoal();" block it won't show dummy.
+    return [];
   }
 
   @override
@@ -158,20 +162,6 @@ class DataRepositoryImpl implements DataRepository {
 
     try {
       final dashboard = await _remoteDataSource.getDashboard(userId, lang);
-
-      // Update Goals
-      if (dashboard.goals.isNotEmpty) {
-        final goalReq = dashboard.goals.first;
-        final goal = Goal(
-          id: 'goal_${DateTime.now().millisecondsSinceEpoch}',
-          name: goalReq.name,
-          type: goalReq.type,
-          targetAmount: goalReq.targetAmount,
-          savedAmount: 0,
-          deadlineMonths: int.tryParse(goalReq.deadline) ?? 12,
-        );
-        await _localDataSource.saveGoal(goal);
-      }
 
       // Update Transactions
       for (var tRaw in dashboard.recentTransactions) {

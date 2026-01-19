@@ -58,6 +58,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
+                      isExpanded: true,
                       value: type,
                       decoration: InputDecoration(
                         labelText: lang == 'ar' ? 'النوع' : 'Type',
@@ -98,6 +99,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<int>(
+                      isExpanded: true,
                       value: deadlineMonths,
                       decoration: InputDecoration(
                         labelText: lang == 'ar' ? 'المدة' : 'Deadline',
@@ -147,8 +149,13 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(Icons.auto_awesome, size: 18),
-                          const SizedBox(width: 8),
-                          Text(t(lang, 'feasibility')),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              t(lang, 'feasibility'),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -161,8 +168,13 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(Icons.mic_none_outlined, size: 18),
-                          const SizedBox(width: 8),
-                          Text(t(lang, 'voice')),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              t(lang, 'voice'),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                     ),

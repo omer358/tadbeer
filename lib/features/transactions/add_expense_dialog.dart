@@ -248,8 +248,13 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(Icons.photo_camera_outlined, size: 18),
-                          const SizedBox(width: 8),
-                          Text(t(lang, 'camera')),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              t(lang, 'camera'),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                     ),
